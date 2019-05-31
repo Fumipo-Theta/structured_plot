@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.dates as mdates
-from subplot import Subplot
+from .subplot import Subplot
 from func_helper import identity
 import func_helper.func_helper.dataframe as dataframe
 from func_helper.func_helper.iterator import DuplicateLast as Duplicated

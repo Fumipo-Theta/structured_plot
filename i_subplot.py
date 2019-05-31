@@ -1,6 +1,6 @@
 import pandas as pd
 from abc import ABC, abstractmethod
-from matdat.matdat.data_loader import DictLoader, DataFrameLoader, TableLoader, TestLoader
+from data_loader import DictLoader, DataFrameLoader, TableLoader, TestLoader
 
 
 class ISubplot(ABC):

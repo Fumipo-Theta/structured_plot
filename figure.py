@@ -1,10 +1,9 @@
 # %%
 from func_helper import pip, identity
-from i_subplot import ISubplot
-from concatable import Concatable
-from layout import Matpos
-from figure_sizing import FigureSizing
-from subgrid import Subgrid
+from .i_subplot import ISubplot
+from .layout import Layout
+from .figure_sizing import FigureSizing
+from .subgrid import Subgrid
 
 # %%
 
@@ -71,10 +70,10 @@ class Figure:
              **kwargs
              ):
         if len(arg) > 0:
-            if type(arg[0]) is Matpos:
-                matpos = arg[0]
-                subgrids = arg[1]
-                return self._show_on_layout(matpos, subgrids, **kwargs)
+            if type(arg[0]) is Layout:
+                layout = arg[0]
+                order = arg[1] if len(arg) >= 2 else None
+                return self._show_on_layout(layout, order, **kwargs)
             elif type(arg[0]) is FigureSizing:
                 figure_sizing = arg[0]
                 return self._show_on_grid(
@@ -88,7 +87,7 @@ class Figure:
                 return self.show(**arg[0], **kwargs)
             else:
                 raise SystemError(
-                    "Type of positional arguments must be Matpos or dict. Or use keyword arguments.")
+                    "Type of positional arguments must be Layout or dict. Or use keyword arguments.")
 
         else:
             if type(size) is tuple:
@@ -100,7 +99,7 @@ class Figure:
                 return self._show_on_grid(size, **kwargs)
             else:
                 raise TypeError(
-                    "The first arguments must be MatPos, Tuple, or List")
+                    "The first arguments must be Layout, Tuple, or List")
 
     def _show_on_grid(self,
                       sizes,
@@ -112,22 +111,22 @@ class Figure:
                       dpi=72,
                       **kwargs):
 
-        matpos = Matpos(unit=unit, dpi=dpi)
-        sgs = matpos.add_grid(sizes, column, margin)
+        layout = Layout(unit=unit, dpi=dpi)
+        layout.add_grid(sizes, column, margin)
 
-        return self._show_on_layout(matpos, sgs, padding, test, dpi=dpi, **kwargs)
+        return self._show_on_layout(layout, None, padding, test, dpi=dpi, **kwargs)
 
     def _show_on_layout(self,
-                        matpos,
-                        subgrids,
+                        layout,
+                        subgrid_order,
                         padding={},
                         test=False,
                         **kwargs):
-        for sg, subplot in zip(subgrids, self.subplots):
+        for sg, subplot in zip(layout.get_subgrids(subgrid_order), self.subplots):
             sg.set_axes_option(**subplot.get_axes_spec())
 
-        fig, empty_axes = matpos.figure_and_axes(
-            subgrids, padding=padding, **kwargs
+        fig, empty_axes = layout.figure_and_axes(
+            subgrid_order, padding=padding, **kwargs
         )
 
         while len(self.subplots) < len(empty_axes):

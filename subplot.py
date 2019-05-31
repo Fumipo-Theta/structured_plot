@@ -2,12 +2,12 @@ from func_helper import identity, pip
 import func_helper.func_helper.iterator as it
 import func_helper.func_helper.dataframe as dataframe
 import func_helper.func_helper.dictionary as dictionary
-from matdat.matdat.get_path import getFileList, PathList
-from i_subplot import ISubplot
+from data_loader import PathList
+from .i_subplot import ISubplot
 import pandas as pd
 from typing import List, Tuple, Callable, Union, Optional, TypeVar
 from func_helper.func_helper.iterator import DuplicateLast as Duplicated
-import plot_action as plot
+from . import plot_action as plot
 
 
 DataSource = Union[dict, pd.DataFrame, pd.Series, PathList]
