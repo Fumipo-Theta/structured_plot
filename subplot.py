@@ -75,6 +75,24 @@ class Subplot(ISubplot):
     def __new__(cls, *arg, **kwargs):
         return super().__new__(cls)
 
+    def __add__(self, subplot):
+        new_subplot = self.forked()
+        for i in range(subplot.length):
+            new_subplot.add(
+                **dictionary.mix(
+                    {
+                        "data": subplot.data[i],
+                        "dataInfo": subplot.dataInfo[i],
+                        "index": subplot.index_name[i],
+                        "plot": subplot.plotMethods[i],
+                        "second_axis": subplot.is_second_axes[i],
+                        "transformer": subplot.dataTransformer[i],
+                    },
+                    subplot.option[i]
+                )
+            )
+        return new_subplot
+
     def __init__(self, *style_dict, axes_spec={}, **style):
         self.axes_spec = axes_spec
         self.data = []
@@ -503,7 +521,7 @@ class Subplot(ISubplot):
             xFmt
         """
 
-        new_subplot = self.create(
+        new_subplot = Subplot(
             **mix_dict(self.axes_style,
                        style_kwargs)[0]
         )
