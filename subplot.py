@@ -155,6 +155,9 @@ class Subplot(ISubplot):
             "style": {}
         }
 
+        _style, _ = mix_dict(style_dict[1], {}) if len(style_dict) > 1 else mix_dict({}, {})
+        self.diff_second_axes_style, rest_style = mix_dict(self.diff_second_axes_style, _style)
+
         # print(self.axes_style)
 
         self.length = 0

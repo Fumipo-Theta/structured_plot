@@ -67,12 +67,12 @@ class Figure:
     def show(self,
              *arg,
              size=None,
+             order=None,
              **kwargs
              ):
         if len(arg) > 0:
             if type(arg[0]) is Layout:
                 layout = arg[0]
-                order = arg[1] if len(arg) >= 2 else None
                 return self._show_on_layout(layout, order, **kwargs)
             elif type(arg[0]) is FigureSizing:
                 figure_sizing = arg[0]
@@ -81,6 +81,7 @@ class Figure:
                      for i in range(len(self))],
                     margin=figure_sizing.get_margin(),
                     padding=figure_sizing.get_padding(),
+                    order=order,
                     **kwargs
                 )
             elif type(arg[0]) is dict:
@@ -93,10 +94,11 @@ class Figure:
             if type(size) is tuple:
                 return self._show_on_grid(
                     [size for i in range(len(self))],
+                    order=order,
                     **kwargs
                 )
             elif type(size) is list:
-                return self._show_on_grid(size, **kwargs)
+                return self._show_on_grid(size, order=order, **kwargs)
             else:
                 raise TypeError(
                     "The first arguments must be Layout, Tuple, or List")
@@ -106,6 +108,7 @@ class Figure:
                       column=1,
                       margin=(1, 0.5),
                       padding={},
+                      order=None,
                       test=False,
                       unit="inches",
                       dpi=72,
@@ -114,19 +117,19 @@ class Figure:
         layout = Layout(unit=unit, dpi=dpi)
         layout.add_grid(sizes, column, margin)
 
-        return self._show_on_layout(layout, None, padding, test, dpi=dpi, **kwargs)
+        return self._show_on_layout(layout, order, padding, test, dpi=dpi, **kwargs)
 
     def _show_on_layout(self,
                         layout,
-                        subgrid_order,
+                        order=None,
                         padding={},
                         test=False,
                         **kwargs):
-        for sg, subplot in zip(layout.get_subgrids(subgrid_order), self.subplots):
+        for sg, subplot in zip(layout.get_subgrids(order), self.subplots):
             sg.set_axes_option(**subplot.get_axes_spec())
 
         fig, empty_axes = layout.figure_and_axes(
-            subgrid_order, padding=padding, **kwargs
+            order, padding=padding, **kwargs
         )
 
         while len(self.subplots) < len(empty_axes):
