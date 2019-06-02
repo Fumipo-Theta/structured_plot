@@ -21,7 +21,7 @@ T = TypeVar("T")
 def filter_dict(ref_keys):
     return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
 
-
+# %%
 def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
     d = {}
     for key in target.keys():
@@ -33,6 +33,10 @@ def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
                 key, target[key]) if consume else mix_dict.get(key, target[key])
     return d, mix_dict
 
+# %%
+mix_dict({"xlabel":{"fontsize":12}},{"xlim" : [0,1], "xlabel":{}})
+
+# %%
 
 def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
     """
@@ -130,8 +134,8 @@ class Subplot(ISubplot):
             "style": {}
         }
 
-        _style, _ = mix_dict(style_dict[0], style) if len(
-            style_dict) > 0 else mix_dict(style, {})
+        _style = {**style_dict[0], **style} if len(
+            style_dict) > 0 else style
         self.axes_style, rest_style = mix_dict(
             default_axes_style, _style, True)
         self.axes_style["style"].update({
@@ -155,7 +159,7 @@ class Subplot(ISubplot):
             "style": {}
         }
 
-        _style, _ = mix_dict(style_dict[1], {}) if len(style_dict) > 1 else mix_dict({}, {})
+        _style= style_dict[1] if len(style_dict) > 1 else {}
         self.diff_second_axes_style, rest_style = mix_dict(self.diff_second_axes_style, _style)
 
         # print(self.axes_style)
@@ -226,8 +230,8 @@ class Subplot(ISubplot):
                     lambda i: self.is_second_axes[i], range(self.length))
             )
 
-            second_xaxis_style = {**self.get_second_axis_style(), "ylim": []}
-            second_yaxis_style = {**self.get_second_axis_style(), "xlim": []}
+            second_xaxis_style = {**self.get_second_axis_style()}
+            second_yaxis_style = {**self.get_second_axis_style()}
 
             # A hack for changing the first and the second axis limits independently.
             ax2 = pip(
@@ -268,7 +272,7 @@ class Subplot(ISubplot):
         return plotter
 
     def __getPlotAction(self, i):
-        dfs: Duplicated = self.__read(i)
+        dfs: Duplicated = self.read(i)
         opt = self.get_option(i)
 
         if len(dfs) == 0 or all(map(lambda df: len(df) is 0, dfs.args)):
@@ -278,7 +282,7 @@ class Subplot(ISubplot):
             *[f(dfs, opt) for f in self.plotMethods[i]],
         )(ax)
 
-    def __read(self, i)->Tuple[pd.DataFrame]:
+    def read(self, i)->Tuple[pd.DataFrame]:
         """
         Indipendent from type of data source.
         """
@@ -453,7 +457,7 @@ class Subplot(ISubplot):
             )
 
         # plot
-        self.plotMethods.append(plot)
+        self.plotMethods.append(plot if type(plot) is list else [plot])
 
         # plot option
         _option = dictionary.mix(option, kwargs)

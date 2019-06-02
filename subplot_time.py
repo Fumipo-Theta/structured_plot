@@ -42,9 +42,10 @@ class SubplotTime(Subplot):
 
     def __init__(self, *style_dict, **style):
         super().__init__(*style_dict, **{
-            # "xFmt": "%m/%d",
+            "xFmt": "%y/%m/%d",
             **style
         })
+
         self.filter_x = True
 
     def plot(self, ax, test=False):
@@ -55,10 +56,9 @@ class SubplotTime(Subplot):
 
     def setXaxisFormat(self):
         def f(ax):
+            xFmt = self.axes_style["style"].get("xFmt")
             ax.xaxis.set_major_formatter(
-                mdates.DateFormatter(
-                    self.axes_style["style"].get("xFmt", None)
-                )
+                mdates.DateFormatter(xFmt)
             )
             return ax
         return f
