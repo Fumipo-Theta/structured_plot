@@ -3,6 +3,14 @@
 このパッケージは宣言的で再利用可能なパーツを組み合わせてデータプロットを行うためのものである.
 また, このパッケージは `matplotlib` を使用したプロットのラッパーでもある.
 
+## Dependency
+
+* numpy
+* matplotlib
+* pandas
+* [data_loader](https://github.com/Fumipo-Theta/data_loader.git)
+* [func_helper](https://github.com/Fumipo-Theta/func_helper.git)
+
 ## Import
 
 ```python
