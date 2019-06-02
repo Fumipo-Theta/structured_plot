@@ -115,8 +115,8 @@ class Subplot(ISubplot):
             "label": {
                 "fontsize": 16,
             },
-            "xlabel_setting": {},
-            "ylabel_setting": {},
+            "xlabel": {},
+            "ylabel": {},
             "scale": {
                 "xscale": None,
                 "yscale": None,
@@ -145,8 +145,8 @@ class Subplot(ISubplot):
             "xlim": [],
             "ylim": [],
             "label": {},
-            "xlabel_setting": {},
-            "ylabel_setting": {},
+            "xlabel": {},
+            "ylabel": {},
             "scale": {},
             "tick": {},
             "xtick": {},
@@ -257,9 +257,9 @@ class Subplot(ISubplot):
                 plot.set_xlim()({}, {"xlim": style["xlim"]}),
                 plot.set_ylim()({}, {"ylim": style["ylim"]}),
                 plot.set_xlabel()(
-                    {}, {**style["label"], **style["xlabel_setting"]}),
+                    {}, {**style["label"], **style["xlabel"]}),
                 plot.set_ylabel()(
-                    {}, {**style["label"], **style["ylabel_setting"]}),
+                    {}, {**style["label"], **style["ylabel"]}),
                 plot.set_grid()({}, style["grid"])
             )
         return plotter
@@ -353,12 +353,8 @@ class Subplot(ISubplot):
             tick: dict={},
             xtick: dict={},
             ytick: dict={},
-            label: dict={},
-            xlabel_setting: dict={},
-            ylabel_setting: dict={},
             xlabel: Optional[str]=None,
             ylabel: Optional[str]=None,
-            grid: dict={},
             cycler=None,
             within_xlim: bool=False,
             second_axis: bool=False,
@@ -392,14 +388,8 @@ class Subplot(ISubplot):
             "linear", "log" can be used.
         tick, xtick, ytick, optional: dict
             Dict defining style of ticks.
-        label, optional:
-            Dict defining style of axis labels.
         xlabel, ylabel, optional: str
             Str for x and y label of axis.
-        grid, optional: dict
-            Dict defining style of grid lines.
-        cycler, optional: cycler
-            Cycler defining cycling style of plotted symbols.
         within_xlim, optional: bool
             Flag whether plot only data in xlim.
         second_axis, optinal: bool
@@ -420,17 +410,8 @@ class Subplot(ISubplot):
         update_axes_style = dictionary.mix(
             {
                 "label": dictionary.mix(
-                    label,
                     {"xlabel": xlabel} if xlabel is not None else {},
                     {"ylabel": ylabel} if ylabel is not None else {}
-                ),
-                "xlabel_setting": dictionary.mix(
-                    {},
-                    xlabel_setting if type(xlabel_setting) is dict else {}
-                ),
-                "ylabel_setting": dictionary.mix(
-                    {},
-                    ylabel_setting if type(ylabel_setting) is dict else {}
                 ),
                 "scale": {
                     "xscale": xscale,
@@ -451,12 +432,10 @@ class Subplot(ISubplot):
                 ),
                 "xtick": xtick,
                 "ytick": ytick,
-                "grid": grid,
             },
             kwargs.get("limit", {}),
             {"xlim": xlim} if xlim is not None else {},
             {"ylim": ylim} if ylim is not None else {},
-            {"cycler": cycler} if cycler else {}
         )
 
         if not second_axis:
