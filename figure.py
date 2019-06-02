@@ -4,6 +4,7 @@ from .i_subplot import ISubplot
 from .layout import Layout
 from .figure_sizing import FigureSizing
 from .subgrid import Subgrid
+from .subplot import Subplot
 
 # %%
 
