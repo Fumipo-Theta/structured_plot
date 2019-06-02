@@ -154,6 +154,26 @@ class Layout:
             np.max([self.right_bottom[1], sg_origin[1] + sg_size[1]])
         )
 
+    def add_origin(self, new_name, size: Size, offset: Size=(0,0), **kwd):
+        sg = self.get_subgrids([None])[0]
+
+        _offset = self.to_default_unit(offset)
+        _size = self.to_default_unit(size)
+
+        next_origin = (
+            sg.origin[0] + _offset[0],
+            sg.origin[1] + _offset[1]
+        )
+
+        next_size = (
+            _size[0] if _size[0] is not None else sg.get_width() - _offset[0],
+            _size[1] if _size[1] is not None else sg.get_height() - _offset[1]
+        )
+
+        self.__expand(next_origin, next_size)
+        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        return self
+
     def from_left_top(self, origin_name, new_name, size:Size, offset:Size=(0, 0), **kwd):
         """
         Layout a new subplot based on the position of
@@ -400,7 +420,7 @@ class Layout:
         d = margin if type(margin) is tuple else (margin, margin)
 
         size, *rest_sizes = sizes
-        self.from_left_top(None, 0, size)
+        self.add_origin(0, size)
 
         for i, size in enumerate(rest_sizes):
             l = len(self)
