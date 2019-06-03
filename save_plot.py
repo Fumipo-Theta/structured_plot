@@ -29,4 +29,4 @@ def __IFigureSaver(ext):
 @__mkdir
 def save_plot(directory, fileName, ext="png"):
     saver = __IFigureSaver(ext)
-    return saver(directory, fileName)()
+    return saver(directory, fileName)
