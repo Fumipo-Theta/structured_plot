@@ -30,7 +30,7 @@ def factor_box(df: DataSource, x, y, *arg, xfactor=None, **kwargs)->AxPlot:
     Generate box plots grouped by a factor column in DataFrame.
 
     """
-    _factor_series, _factor = Iget_factor(df, x, xfactor)
+    _factor_series, _factor, position = Iget_factor(df, x, xfactor)
     _factor_detector = pd.Categorical(
         _factor_series, ordered=True, categories=_factor)
 
@@ -45,17 +45,17 @@ def factor_box(df: DataSource, x, y, *arg, xfactor=None, **kwargs)->AxPlot:
         ax.boxplot(
             _data_without_nan,
             labels=_factor,
-            positions=range(0, len(_factor)),
+            positions=position,
             **kwargs
         )
 
         if kwargs.get("vert", True):
-            ax.set_xticks(list(range(0, len(_factor))))
+            ax.set_xticks(position)
             ax.set_xticklabels(_factor)
-            ax.set_xlim([-1, len(_factor)])
+            #ax.set_xlim([-1, len(_factor)])
         else:
-            ax.set_yticks(list(range(0, len(_factor))))
+            ax.set_yticks(position)
             ax.set_yticklabels(_factor)
-            ax.set_ylim([-1, len(_factor)])
+            #ax.set_ylim([-1, len(_factor)])
         return ax
     return plot

@@ -245,15 +245,16 @@ def get_values_by_keys(k: list, default=None)->Callable[[dict], list]:
 def Iget_factor(
     df: pd.DataFrame,
     f: Union[str, Callable[[pd.DataFrame], pd.Series]],
-    factor: Optional[Union[list, Callable[[pd.DataFrame], pd.Series]]]
+    factor: Optional[Union[list, Callable[[pd.DataFrame], Tuple[pd.Series,list,list]]]]
 )->Tuple[pd.Series, list]:
     d = f(df) if callable(f) else df[f]
     if type(factor) is list:
-        return (d, factor)
+        return (d, factor, list(range(len(factor))))
     elif callable(factor):
         return factor(d)
     else:
-        return (d, d.astype('category').cat.categories)
+        cat = d.astype('category').cat.categories
+        return (d, cat, list(range(len(cat))))
 
 
 def selector_or_literal(df, s):
