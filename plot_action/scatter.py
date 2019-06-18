@@ -11,6 +11,10 @@ def scatter(
     *arg,
     c: LiteralOrSequencer=None,
     s: LiteralOrSequencer=None,
+    cmap=None,
+    vmin=None,
+    vmax=None,
+    norm=None,
     **kwargs
 )->AxPlot:
 
@@ -22,9 +26,17 @@ def scatter(
 
     colors = get_literal_or_series(c, data)
     sizes = get_literal_or_series(s, data)
-    new_kwargs = {k: get_literal_or_series(v, data) for k, v in kwargs.items()}
+    new_kwargs = {
+        **{k: get_literal_or_series(v, data) for k, v in kwargs.items()},
+        "s": sizes,
+        "c": colors,
+        "cmap": cmap,
+        "vmin": vmin,
+        "vmax": vmax,
+        "norm": norm,
+    }
 
     def plot(ax):
-        ax.scatter(_x, _y, s=sizes, c=colors, **new_kwargs)
+        ax.scatter(_x, _y, **new_kwargs)
         return ax
     return plot
