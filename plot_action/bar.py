@@ -1,4 +1,4 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor, get_literal_or_series
 from .action import DataSource, AxPlot
 import pandas as pd
 import numpy as np
@@ -12,7 +12,9 @@ import func_helper.func_helper.iterator as it
     "xfactor": None,
     "yfactor": None,
     "legend_labels": None,
-    "legend": {}
+    "legend": {},
+    "vert": True,
+    "show_factor_ticks": True,
 })
 def factor_bar(
     df: DataSource,
@@ -22,10 +24,13 @@ def factor_bar(
     *arg,
     xfactor=None,  # explicit factor list
     yfactor=None,  # explicit factor list
+    width=None,
+    color=None,
     norm=False,
     vert=True,
     legend_labels=None,
     legend={},
+    show_factor_ticks=True,
         **kwargs):
     """
     plot.bar(**presetting)(df, option, **kwargs)(ax)
@@ -123,7 +128,7 @@ def factor_bar(
 
     plot_arg = {
         **kwargs,
-        "tick_label": kwargs.get("tick_label", x_factor)
+        # "tick_label": kwargs.get("tick_label", x_factor)
     }
 
     def plot(ax):
@@ -148,15 +153,18 @@ def factor_bar(
             ax.legend(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
+        if not show_factor_ticks:
+            return ax
+
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(x_factor)
-            #ax.set_xlim([-1, len(x_factor)])
+            ax.set_xlim([-1, len(x_factor)])
             pass
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(x_factor)
-            #ax.set_ylim([-1, len(x_factor)])
+            ax.set_ylim([-1, len(x_factor)])
             pass
 
         return ax
@@ -168,7 +176,9 @@ def factor_bar(
     **default_kwargs.get("bar"),
     "xfactor": None,
     "legend_labels": None,
-    "legend": {}
+    "legend": {},
+    "vert": True,
+    "show_factor_ticks": True,
 })
 def bar(
     df: DataSource,
@@ -176,11 +186,13 @@ def bar(
     y: str,  # stack factor selector
     yagg,  # aggregate
     *arg,
+    color=None,
     xfactor=None,  # explicit factor list
     norm=False,
     vert=True,
     legend_labels=None,
     legend={},
+    show_factor_ticks=True,
         **kwargs):
     """
     plot.bar(**presetting)(df, option, **kwargs)(ax)
@@ -226,7 +238,7 @@ def bar(
         # それを回避するためにfillna(0)してある.
         stack_heights = pip(
             it.mapping(lambda df: yagg(df[stack_name].fillna(0))),
-            #it.mapping(lambda arr: arr[0] if len(arr) > 0 else 0),
+            # it.mapping(lambda arr: arr[0] if len(arr) > 0 else 0),
             list
         )(subset_for_x_factor)
 
@@ -249,7 +261,7 @@ def bar(
 
     plot_arg = {
         **kwargs,
-        "tick_label": kwargs.get("tick_label", x_factor)
+        # "tick_label": kwargs.get("tick_label", x_factor)
     }
 
     def plot(ax):
@@ -274,37 +286,85 @@ def bar(
             ax.legend(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
+        if not show_factor_ticks:
+            return ax
+
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(x_factor)
-            #ax.set_xlim([-1, len(x_factor)])
+            ax.set_xlim([-1, len(x_factor)])
             pass
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(x_factor)
-            #ax.set_ylim([-1, len(x_factor)])
+            ax.set_ylim([-1, len(x_factor)])
             pass
         return ax
     return plot
 
 
-@plot_action(["x", "y"], {
-    **default_kwargs.get("bar"),
-    "xfactor": None,
-    "legend_labels": None,
-    "legend": {}
-})
-def polar_bar(
+@plot_action(
+    ["x", "y", "yagg"],
+    {
+        **default_kwargs.get("bar"),
+        "xfactor": None,
+        "cmap": None,
+    }
+)
+def rose(
     df: DataSource,
     x,  # factor1 selector
     y: str,  # stack factor selector
     yagg,  # aggregate
     *arg,
+    width=None,
+    color=None,
+    cmap=None,
     xfactor=None,  # explicit factor list
     norm=False,
-    vert=True,
-    legend_labels=None,
-    legend={},
-        **kwargs
+    **kwargs
 ):
-    pass
+    x_factor_series, x_factor, position = Iget_factor(df, x, xfactor)
+
+    x_group = df.groupby(
+        pd.Categorical(
+            x_factor_series,
+            ordered=True,
+            categories=x_factor
+        )
+    )
+
+    subset_for_x_factor = [
+        df.loc[x_group.groups[xfname]]
+        for xfname in x_factor
+    ]
+
+    # aggrigation時にnanがあると, normalize時にsumがnanになる.
+    # それを回避するためにfillna(0)してある.
+    heights = pip(
+        it.mapping(lambda df: yagg(df[y].fillna(0))),
+        pd.Series
+    )(subset_for_x_factor)
+
+    colors = pip(
+        it.mapping(lambda df: get_literal_or_series(color, df)),
+        pd.Series
+    )(subset_for_x_factor)
+
+    if norm:
+        sum = np.sum(heights)
+
+        heights = heights.apply(
+            lambda height: 0 if sum == 0 else height/sum)
+
+    plot_arg = {
+        "width": width,
+        "color": colors,
+        **kwargs
+    }
+
+    def plot(ax):
+        ax.bar(position, heights, **plot_arg)
+
+        return ax
+    return plot
