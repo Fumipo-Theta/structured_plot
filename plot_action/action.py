@@ -7,6 +7,7 @@ from typing import Union, List, Tuple, TypeVar, Callable, NewType, Optional
 from func_helper import pip
 import func_helper.func_helper.iterator as it
 from func_helper.func_helper.iterator import DuplicateLast
+from .mapping import IGetSeriesOrLiteral
 
 DataSource = Union[dict, pd.DataFrame, pd.Series]
 Ax = matplotlib.axes._subplots.Axes
@@ -158,7 +159,9 @@ def get_subset(use_index=True)\
 
 def get_literal_or_series(input: LiteralOrSequencer, df: DataSource)->LiteralOrSequence:
 
-    if callable(input):
+    if isinstance(input, IGetSeriesOrLiteral):
+        return input.apply(df)
+    elif callable(input):
         return input(df)
     else:
         return input
@@ -246,7 +249,7 @@ def Iget_factor(
     df: pd.DataFrame,
     f: Union[str, Callable[[pd.DataFrame], pd.Series]],
     factor: Optional[Union[list, Callable[[pd.DataFrame], Tuple[pd.Series,list,list]]]]
-)->Tuple[pd.Series, list]:
+)->Tuple[pd.Series, list, list]:
     d = f(df) if callable(f) else df[f]
     if type(factor) is list:
         return (d, factor, list(range(len(factor))))
@@ -485,8 +488,9 @@ _hist_kwargs = {
 
 _bar_kwargs = {
     "norm": False,
-    "vert": True,
-    # "width": 0.8,
+    "width": None,
+    "color" : "blue",
+    "alpha" : 1,
     "align": "center",
 }
 
