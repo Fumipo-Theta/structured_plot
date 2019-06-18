@@ -22,8 +22,10 @@ velocity
 band
 text
 """
+from matplotlib.pyplot import cm as colormap
 
 from .action import *
+from .mapping import *
 from .multiple import multiple
 from .axes_style import *
 from .scatter import scatter
@@ -35,7 +37,7 @@ from .box import box, factor_box
 from .violin import violin, factor_violin
 from .text import text
 from .hist import hist
-from .bar import bar, factor_bar
+from .bar import bar, factor_bar, rose
 from .cycler import *
 from .fill import *
 from .imshow import *
