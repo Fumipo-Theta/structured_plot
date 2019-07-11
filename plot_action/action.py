@@ -263,7 +263,7 @@ def selector_or_literal(df, s):
         return s(df)
     elif type(s) is list:
         return s
-    elif type(s) in [int, float]:
+    elif type(s) in [int, float, str]:
         return [s]
     elif s in df:
         return df[s]
