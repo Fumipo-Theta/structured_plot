@@ -132,7 +132,7 @@ def factor_violin(
     与えられなかったときはdf[f]でgroupbyする.
     """
 
-    _factor_series, _factor = Iget_factor(df, x, xfactor)
+    _factor_series, _factor, position = Iget_factor(df, x, xfactor)
     _factor_detector = pd.Categorical(
         _factor_series, ordered=True, categories=_factor)
 
@@ -149,7 +149,7 @@ def factor_violin(
     )(enumerate(_data_without_nan))
 
     dataset = [iv[1].values for iv in _subset_hasLegalLength]
-    _positions = [iv[0] for iv in _subset_hasLegalLength]
+    _positions = [position[iv[0]] for iv in _subset_hasLegalLength]
 
     if scale is "count":
         count = [len(d) for d in dataset]
@@ -188,11 +188,11 @@ def factor_violin(
         if kwargs.get("vert", True):
             ax.set_xticks(list(range(0, len(_factor))))
             ax.set_xticklabels(_factor)
-            ax.set_xlim([-1, len(_factor)])
+            #ax.set_xlim([-1, len(_factor)])
         else:
             ax.set_yticks(list(range(0, len(_factor))))
             ax.set_yticklabels(_factor)
-            ax.set_ylim([-1, len(_factor)])
+            #ax.set_ylim([-1, len(_factor)])
 
         return ax
     return plot

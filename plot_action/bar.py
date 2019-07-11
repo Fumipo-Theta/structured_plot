@@ -61,7 +61,7 @@ def factor_bar(
     """
     1. stacking bar plotのstackしていくgroupingをつくる
     """
-    stack_series, stack_factor = Iget_factor(df, y, yfactor)
+    stack_series, stack_factor, _ = Iget_factor(df, y, yfactor)
     stack_group = df.groupby(
         pd.Categorical(
             stack_series,
@@ -83,7 +83,7 @@ def factor_bar(
     for stack_name in stack_factor:
         subset = df.loc[stack_group.groups[stack_name]]
 
-        x_factor_series, x_factor = Iget_factor(subset, x, xfactor)
+        x_factor_series, x_factor, position = Iget_factor(subset, x, xfactor)
 
         x_group = subset.groupby(
             pd.Categorical(
@@ -121,7 +121,6 @@ def factor_bar(
             list
         )(stack_bars)
 
-    ind = list(range(len(x_factor)))
     plot_arg = {
         **kwargs,
         "tick_label": kwargs.get("tick_label", x_factor)
@@ -132,17 +131,17 @@ def factor_bar(
         for i, bar in enumerate(stack_bars):
             if vert:
                 if i is 0:
-                    ax.bar(ind, bar, **plot_arg)
+                    ax.bar(position, bar, **plot_arg)
                 else:
                     ax.bar(
-                        ind, bar, bottom=prev_top, **plot_arg)
+                        position, bar, bottom=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
             else:
                 if i is 0:
-                    ax.barh(ind, bar, **plot_arg)
+                    ax.barh(position, bar, **plot_arg)
                 else:
                     ax.barh(
-                        ind, bar, left=prev_top, **plot_arg)
+                        position, bar, left=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
 
         if (legend is not None) and (legend is not False):
@@ -150,13 +149,15 @@ def factor_bar(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
         if vert:
-            # ax.set_xticks(ind)
-            # ax.set_xticklabels(x_factor)
-            ax.set_xlim([-1, len(x_factor)])
+            ax.set_xticks(position)
+            ax.set_xticklabels(x_factor)
+            #ax.set_xlim([-1, len(x_factor)])
+            pass
         else:
-            # ax.set_yticks(ind)
-            # ax.set_yticklabels(x_factor)
-            ax.set_ylim([-1, len(x_factor)])
+            ax.set_yticks(position)
+            ax.set_yticklabels(x_factor)
+            #ax.set_ylim([-1, len(x_factor)])
+            pass
 
         return ax
     return plot
@@ -206,7 +207,7 @@ def bar(
     for stack_name in stack_factor:
         subset = df
 
-        x_factor_series, x_factor = Iget_factor(subset, x, xfactor)
+        x_factor_series, x_factor, position = Iget_factor(subset, x, xfactor)
 
         x_group = subset.groupby(
             pd.Categorical(
@@ -246,7 +247,6 @@ def bar(
             list
         )(stack_bars)
 
-    ind = list(range(len(x_factor)))
     plot_arg = {
         **kwargs,
         "tick_label": kwargs.get("tick_label", x_factor)
@@ -257,17 +257,17 @@ def bar(
         for i, bar in enumerate(stack_bars):
             if vert:
                 if i is 0:
-                    ax.bar(ind, bar, **plot_arg)
+                    ax.bar(position, bar, **plot_arg)
                 else:
                     ax.bar(
-                        ind, bar, bottom=prev_top, **plot_arg)
+                        position, bar, bottom=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
             else:
                 if i is 0:
-                    ax.barh(ind, bar, **plot_arg)
+                    ax.barh(position, bar, **plot_arg)
                 else:
                     ax.barh(
-                        ind, bar, left=prev_top, **plot_arg)
+                        position, bar, left=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
 
         if (legend is not None) and (legend is not False):
@@ -275,13 +275,36 @@ def bar(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
         if vert:
-            # ax.set_xticks(ind)
-            # ax.set_xticklabels(x_factor)
-            ax.set_xlim([-1, len(x_factor)])
+            ax.set_xticks(position)
+            ax.set_xticklabels(x_factor)
+            #ax.set_xlim([-1, len(x_factor)])
+            pass
         else:
-            # ax.set_yticks(ind)
-            # ax.set_yticklabels(x_factor)
-            ax.set_ylim([-1, len(x_factor)])
-
+            ax.set_yticks(position)
+            ax.set_yticklabels(x_factor)
+            #ax.set_ylim([-1, len(x_factor)])
+            pass
         return ax
     return plot
+
+
+@plot_action(["x", "y"], {
+    **default_kwargs.get("bar"),
+    "xfactor": None,
+    "legend_labels": None,
+    "legend": {}
+})
+def polar_bar(
+    df: DataSource,
+    x,  # factor1 selector
+    y: str,  # stack factor selector
+    yagg,  # aggregate
+    *arg,
+    xfactor=None,  # explicit factor list
+    norm=False,
+    vert=True,
+    legend_labels=None,
+    legend={},
+        **kwargs
+):
+    pass

@@ -7,12 +7,12 @@ from .i_subplot import ISubplot
 import pandas as pd
 from typing import List, Tuple, Callable, Union, Optional, TypeVar
 from func_helper.func_helper.iterator import DuplicateLast as Duplicated
-from . import plot_action as plot
+from . import plot_action
 
 
 DataSource = Union[dict, pd.DataFrame, pd.Series, PathList]
-Ax = plot.Ax
-AxPlot = plot.AxPlot
+Ax = plot_action.Ax
+AxPlot = plot_action.AxPlot
 PlotAction = Callable[..., AxPlot]
 DataTransformer = Callable[[pd.DataFrame], pd.DataFrame]
 T = TypeVar("T")
@@ -252,22 +252,22 @@ class Subplot(ISubplot):
 
             """
             return pip(
-                plot.set_cycler(style["cycler"]),
+                plot_action.set_cycler(style["cycler"]),
                 *actions,
-                plot.axis_scale()({}, style["scale"]),
-                plot.set_tick_parameters(axis="both")(
+                plot_action.axis_scale()({}, style["scale"]),
+                plot_action.set_tick_parameters(axis="both")(
                     {}, style["tick"]),
-                plot.set_tick_parameters(axis="x")(
+                plot_action.set_tick_parameters(axis="x")(
                     {}, {**style["tick"], **style["xtick"]}),
-                plot.set_tick_parameters(axis="y")(
+                plot_action.set_tick_parameters(axis="y")(
                     {}, {**style["tick"], **style["ytick"]}),
-                plot.set_xlim()({}, {"xlim": style["xlim"]}),
-                plot.set_ylim()({}, {"ylim": style["ylim"]}),
-                plot.set_xlabel()(
+                plot_action.set_xlim()({}, {"xlim": style["xlim"]}),
+                plot_action.set_ylim()({}, {"ylim": style["ylim"]}),
+                plot_action.set_xlabel()(
                     {}, {**style["label"], **style["xlabel"]}),
-                plot.set_ylabel()(
+                plot_action.set_ylabel()(
                     {}, {**style["label"], **style["ylabel"]}),
-                plot.set_grid()({}, style["grid"])
+                plot_action.set_grid()({}, style["grid"])
             )
         return plotter
 

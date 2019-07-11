@@ -110,7 +110,6 @@ class Figure:
                       margin=(1, 0.5),
                       padding={},
                       order=None,
-                      test=False,
                       unit="inches",
                       dpi=72,
                       **kwargs):
@@ -118,7 +117,7 @@ class Figure:
         layout = Layout(unit=unit, dpi=dpi)
         layout.add_grid(sizes, column, margin)
 
-        return self._show_on_layout(layout, order, padding, test, dpi=dpi, **kwargs)
+        return self._show_on_layout(layout, order, padding, **kwargs)
 
     def _show_on_layout(self,
                         layout,
