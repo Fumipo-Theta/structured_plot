@@ -41,3 +41,4 @@ from .bar import bar, factor_bar, rose
 from .cycler import *
 from .fill import *
 from .imshow import *
+from .errorbar import errorbar

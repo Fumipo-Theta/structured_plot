@@ -99,7 +99,7 @@ class SubplotTime(Subplot):
         index_names = self.index_name[i].args if type(
             self.index_name[i]) is Duplicated else(self.index_name[i],)
 
-        return Duplicated(*[[setIndex(index_name), filterX()] for index_name in index_names])
+        return Duplicated(*[[setIndex(index_name)] for index_name in index_names])
 
     def read(self, i):
 
