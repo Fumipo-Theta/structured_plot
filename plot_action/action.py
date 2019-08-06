@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms
 from typing import Union, List, Tuple, TypeVar, Callable, NewType, Optional
 from func_helper import pip
-import func_helper.func_helper.iterator as it
-from func_helper.func_helper.iterator import DuplicateLast
+import iter_helper as it
+from iter_helper import DuplicateLast
 from .mapping import IGetSeriesOrLiteral
 
 DataSource = Union[dict, pd.DataFrame, pd.Series]

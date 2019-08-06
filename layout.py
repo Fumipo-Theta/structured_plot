@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from func_helper import pip
-from func_helper.func_helper.iterator import mapping, reducing
+from iter_helper import mapping, reducing
 from .subgrid import Subgrid
 from typing import List, Tuple, TypeVar, Callable, Union, Optional
 from .type_set import Ax, Figure, Number, Padding, Size, Coordinate

@@ -17,3 +17,19 @@ def vlines(df: DataSource, x, y, *arg, lower=0, **kwargs)->AxPlot:
         )
         return ax
     return plot
+
+
+@plot_action(["x", "y"], {**default_kwargs.get("vlines"), "lower": 0})
+def hlines(df, x, y, *arg, lower=0, **kwargs):
+    if len(df) is 0:
+        return lambda ax: ax
+
+    _x = get_subset()(df, x)
+    _y = get_subset()(df, y)
+
+    def plot(ax):
+        ax.hlines(
+            _x, [lower for i in _x], _y, **kwargs
+        )
+        return ax
+    return plot

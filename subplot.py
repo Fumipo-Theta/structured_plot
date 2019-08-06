@@ -1,12 +1,12 @@
 from func_helper import identity, pip
-import func_helper.func_helper.iterator as it
-import func_helper.func_helper.dataframe as dataframe
-import func_helper.func_helper.dictionary as dictionary
+import iter_helper as it
+import dataframe_helper as dataframe
+import dict_helper as dictionary
 from data_loader import PathList
 from .i_subplot import ISubplot
 import pandas as pd
 from typing import List, Tuple, Callable, Union, Optional, TypeVar
-from func_helper.func_helper.iterator import DuplicateLast as Duplicated
+from iter_helper import DuplicateLast as Duplicated
 from . import plot_action
 
 

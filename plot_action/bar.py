@@ -3,7 +3,7 @@ from .action import DataSource, AxPlot
 import pandas as pd
 import numpy as np
 from func_helper import pip
-import func_helper.func_helper.iterator as it
+import iter_helper as it
 
 
 @plot_action(["x", "y", "yagg"],

@@ -30,7 +30,7 @@ from .multiple import multiple
 from .axes_style import *
 from .scatter import scatter
 from .line import line
-from .vhlines import vlines
+from .vhlines import vlines, hlines
 from .band import xband, yband
 from .velocity import velocity
 from .box import box, factor_box

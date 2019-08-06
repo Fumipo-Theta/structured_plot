@@ -1,4 +1,4 @@
-from func_helper.func_helper.iterator import DuplicateLast
+from iter_helper import DuplicateLast
 
 
 def multiple(*arg):

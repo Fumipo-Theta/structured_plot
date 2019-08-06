@@ -1,4 +1,4 @@
-import func_helper.func_helper.dictionary as d
+import dict_helper as d
 
 _default_style = {
     "figure_style": {
