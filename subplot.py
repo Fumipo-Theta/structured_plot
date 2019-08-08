@@ -22,6 +22,8 @@ def filter_dict(ref_keys):
     return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
 
 # %%
+
+
 def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
     d = {}
     for key in target.keys():
@@ -33,10 +35,12 @@ def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
                 key, target[key]) if consume else mix_dict.get(key, target[key])
     return d, mix_dict
 
-# %%
-mix_dict({"xlabel":{"fontsize":12}},{"xlim" : [0,1], "xlabel":{}})
 
 # %%
+mix_dict({"xlabel": {"fontsize": 12}}, {"xlim": [0, 1], "xlabel": {}})
+
+# %%
+
 
 def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
     """
@@ -159,8 +163,9 @@ class Subplot(ISubplot):
             "style": {}
         }
 
-        _style= style_dict[1] if len(style_dict) > 1 else {}
-        self.diff_second_axes_style, rest_style = mix_dict(self.diff_second_axes_style, _style)
+        _style = style_dict[1] if len(style_dict) > 1 else {}
+        self.diff_second_axes_style, rest_style = mix_dict(
+            self.diff_second_axes_style, _style)
 
         # print(self.axes_style)
 
@@ -507,7 +512,7 @@ class Subplot(ISubplot):
             xFmt
         """
 
-        new_subplot = Subplot(
+        new_subplot = type(self)(
             **mix_dict(self.axes_style,
                        style_kwargs)[0]
         )
