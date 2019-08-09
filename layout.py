@@ -70,6 +70,9 @@ class Layout:
             raise Exception(f"key {key} has already been resisterd !")
         self._subgrids[name] = subgrid
 
+    def get_a_subgrid(self, name=None):
+        return self._subgrids.get(name, None)
+
     def get_subgrids(self, names=None):
         if len(self) is 0:
             return [self]
@@ -174,7 +177,7 @@ class Layout:
         self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
         return self
 
-    def from_left_top(self, origin_name, new_name, size:Size, offset:Size=(0, 0), **kwd):
+    def from_left_top(self, origin_name, new_name, size:Size, offset:Size=(0, 0), sharex=None,sharey=None,**kwd):
         """
         Layout a new subplot based on the position of
             left-top corner of the former subplot.
@@ -195,10 +198,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_left_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), **kwd)->Subgrid:
+    def from_left_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -215,10 +219,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_right_top(self, origin_name, new_name, size: Size, offset: Size=(0, 0), **kwd)->Subgrid:
+    def from_right_top(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -235,10 +240,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_right_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), **kwd)->Subgrid:
+    def from_right_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -255,10 +261,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_right(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), **kwd)->Subgrid:
+    def add_right(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         """
         Layout a new subplot on the right side of the
             former subplot.
@@ -302,10 +309,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_bottom(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), **kwd)->Subgrid:
+    def add_bottom(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -326,10 +334,10 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(sharex),sharey=self.get_a_subgrid(sharey),**kwd), new_name)
         return self
 
-    def add_top(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), **kwd)->Subgrid:
+    def add_top(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -349,10 +357,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_left(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), **kwd)->Subgrid:
+    def add_left(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -372,7 +381,8 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
     def add_grid(self, sizes:List[Size], column:int=1, margin:Union[Number,Size]=(0, 0), **kwd)->List[Subgrid]:
