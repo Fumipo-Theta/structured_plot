@@ -8,8 +8,9 @@ from func_helper import pip
 import iter_helper as it
 from iter_helper import DuplicateLast
 from .mapping import IGetSeriesOrLiteral
+from .dummy_data import DummyData
 
-DataSource = Union[dict, pd.DataFrame, pd.Series]
+DataSource = Union[dict, pd.DataFrame, pd.Series, DummyData]
 Ax = matplotlib.axes._subplots.Axes
 AxPlot = Callable[[Ax], Ax]
 PlotAction = Callable[[], AxPlot]
@@ -151,6 +152,9 @@ def get_subset(use_index=True)\
             else:
                 return df
 
+        elif type(df) is DummyData:
+            return k
+
         else:
             # print(df)
             raise TypeError("df must be pandas.DataFrame or pandas.Series.")
@@ -248,7 +252,8 @@ def get_values_by_keys(k: list, default=None)->Callable[[dict], list]:
 def Iget_factor(
     df: pd.DataFrame,
     f: Union[str, Callable[[pd.DataFrame], pd.Series]],
-    factor: Optional[Union[list, Callable[[pd.DataFrame], Tuple[pd.Series,list,list]]]]
+    factor: Optional[Union[list, Callable[[
+        pd.DataFrame], Tuple[pd.Series, list, list]]]]
 )->Tuple[pd.Series, list, list]:
     d = f(df) if callable(f) else df[f]
     if type(factor) is list:
@@ -318,6 +323,7 @@ _label_kwargs = {
     "fontsize": 16,
     "fontstyle": "normal",
     "fontweight": "normal",
+    "rotation" : None,
 }
 
 _line2d_kwargs = {
@@ -489,8 +495,8 @@ _hist_kwargs = {
 _bar_kwargs = {
     "norm": False,
     "width": None,
-    "color" : "blue",
-    "alpha" : 1,
+    "color": "blue",
+    "alpha": 1,
     "align": "center",
 }
 

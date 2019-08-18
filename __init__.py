@@ -1,4 +1,5 @@
 from .figure import Figure
+from .i_subplot import ISubplot
 from .subplot import Subplot
 from .subplot_time import SubplotTime
 from .layout import Layout
