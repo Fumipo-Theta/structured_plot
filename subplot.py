@@ -9,7 +9,6 @@ from typing import List, Tuple, Callable, Union, Optional, TypeVar
 from iter_helper import DuplicateLast as Duplicated
 from . import plot_action
 
-
 DataSource = Union[dict, pd.DataFrame, pd.Series, PathList]
 Ax = plot_action.Ax
 AxPlot = plot_action.AxPlot
@@ -260,14 +259,15 @@ class Subplot(ISubplot):
                 plot_action.set_cycler(style["cycler"]),
                 *actions,
                 plot_action.axis_scale()({}, style["scale"]),
+                plot_action.set_xlim()({}, {"xlim": style["xlim"]}),
+                plot_action.set_ylim()({}, {"ylim": style["ylim"]}),
                 plot_action.set_tick_parameters(axis="both")(
                     {}, style["tick"]),
                 plot_action.set_tick_parameters(axis="x")(
                     {}, {**style["tick"], **style["xtick"]}),
                 plot_action.set_tick_parameters(axis="y")(
                     {}, {**style["tick"], **style["ytick"]}),
-                plot_action.set_xlim()({}, {"xlim": style["xlim"]}),
-                plot_action.set_ylim()({}, {"ylim": style["ylim"]}),
+
                 plot_action.set_xlabel()(
                     {}, {**style["label"], **style["xlabel"]}),
                 plot_action.set_ylabel()(
@@ -352,7 +352,7 @@ class Subplot(ISubplot):
             return self.option[i]
 
     def add(self,
-            data: Union[DataSource, Tuple[DataSource]]={},
+            data: Union[DataSource, Tuple[DataSource]]=None,
             dataInfo: dict={},
             index: Optional[Union[List[str], Tuple[List[str]]]]=None,
             transformer: Union[DataTransformer, List[DataTransformer], Tuple[DataTransformer], Tuple[List[DataTransformer]]]=identity,
