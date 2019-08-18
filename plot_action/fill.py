@@ -23,3 +23,24 @@ def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
         return ax
 
     return plot
+
+
+@plot_action(["x", "y"],
+             {
+    "y2": 0,
+    **default_kwargs.get("fill"),
+    "color": "blue"
+})
+def fill(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
+    if len(data) is 0:
+        return lambda ax: ax
+
+    _x = get_subset()(data, x)
+    _y = get_subset()(data, y)
+    _y2 = get_subset()(data, y2)
+
+    def plot(ax):
+        ax.fill(_x, _y, _y2, **kwargs)
+        return ax
+
+    return plot

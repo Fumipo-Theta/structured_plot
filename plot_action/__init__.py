@@ -25,20 +25,22 @@ text
 from matplotlib.pyplot import cm as colormap
 
 from .action import *
+from .axes_style import *
+from .band import xband, yband
+from .bar import bar, factor_bar, rose
+from .box import box, factor_box
+from .contour import contour, contourf
+from .cycler import *
+from .dummy_data import DummyData, DummyLoader
+from .errorbar import errorbar
+from .fill import fill, fill_between
+from .hist import hist
+from .imshow import *
+from .line import line
 from .mapping import *
 from .multiple import multiple
-from .axes_style import *
 from .scatter import scatter
-from .line import line
-from .vhlines import vlines, hlines
-from .band import xband, yband
-from .velocity import velocity
-from .box import box, factor_box
-from .violin import violin, factor_violin
 from .text import text
-from .hist import hist
-from .bar import bar, factor_bar, rose
-from .cycler import *
-from .fill import *
-from .imshow import *
-from .errorbar import errorbar
+from .velocity import velocity
+from .vhlines import vlines, hlines
+from .violin import violin, factor_violin
