@@ -3,6 +3,7 @@ from .action import DataSource, AxPlot
 from typing import Optional
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def set_cycler(cycler=None):
@@ -103,15 +104,34 @@ def set_grid(*arg, axis=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["axis"],
-             default_kwargs.get("tick_params"))
-def set_tick_parameters(df, axis, *arg, **kwargs)->AxPlot:
+@plot_action(["axis"], {
+    **default_kwargs.get("tick_params"),
+    "locations": None, "labels": None
+})
+def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->AxPlot:
     def plot(ax):
+        if axis is "x":
+            if type(locations) in [list, np.ndarray]:
+                ax.set_xticks(locations)
+                #plt.setp(ax.get_xticklabels(), visible=True)
+            if type(labels) in [list, np.ndarray]:
+                ax.set_xticklabels(labels)
+                plt.setp(ax.get_xticklabels(), visible=True)
+        if axis is "y":
+            print(locations, labels)
+            if type(locations) in [list, np.ndarray]:
+                ax.set_yticks(locations)
+                #plt.setp(ax.get_yticklabels(), visible=True)
+            if type(labels) in [list, np.ndarray]:
+                ax.set_yticklabels(labels)
+                plt.setp(ax.get_yticklabels(), visible=True)
+
         if axis is "both":
             ax.tick_params(axis=axis, **kwargs)
         else:
             ax.tick_params(
                 axis=axis, **dict(filter(lambda kv: kv[0] in default_kwargs.get("tick_params_each"), kwargs.items())))
+
         return ax
     return plot
 
@@ -129,43 +149,61 @@ def axis_scale(*arg, xscale=None, yscale=None):
 
 
 @plot_action(["xlabel", "ylabel"],
-             default_kwargs.get("axis_label"))
-def set_label(df: DataSource, xlabel: str, ylabel: str, *arg, **kwargs)->AxPlot:
+             {
+                 **default_kwargs.get("axis_label"),
+})
+def set_label(df: DataSource, xlabel: str, ylabel: str, *arg,
+              xlabelposition=None, ylabelposition=None, **kwargs)->AxPlot:
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
                 xlabel,
                 **kwargs
             )
+
+        if xlabelposition is not None:
+            ax.xaxis.set_label_position(xlabelposition)
+            plt.setp(ax.get_xticklabels(), visible=True)
+
         if ylabel is not None:
             ax.set_ylabel(
                 ylabel,
                 **kwargs
             )
+        if ylabelposition is not None:
+            ax.yaxis.set_label_position(ylabelposition)
+            plt.setp(ax.get_yticklabels(), visible=True)
         return ax
     return plot
 
 
-@plot_action(["xlabel"], default_kwargs.get("axis_label"))
-def set_xlabel(df, xlabel: str, *arg, **kwargs)->AxPlot:
+@plot_action(["xlabel"], {**default_kwargs.get("axis_label"), "xlabelposition": None, })
+def set_xlabel(df, xlabel: str, *arg, xlabelposition=None, **kwargs)->AxPlot:
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
                 xlabel,
                 **kwargs
             )
+
+        if xlabelposition is not None:
+            ax.xaxis.set_label_position(xlabelposition)
+            #plt.setp(ax.get_xticklabels(), visible=True)
         return ax
     return plot
 
 
-@plot_action(["ylabel"], default_kwargs.get("axis_label"))
-def set_ylabel(df, ylabel: str, *arg, **kwargs)->AxPlot:
+@plot_action(["ylabel"], {**default_kwargs.get("axis_label"), "ylabelposition": None, })
+def set_ylabel(df, ylabel: str, *arg, ylabelposition=None, **kwargs)->AxPlot:
     def plot(ax):
         if ylabel is not None:
             ax.set_ylabel(
                 ylabel,
                 **kwargs
             )
+        if ylabelposition is not None:
+            ax.yaxis.set_label_position(ylabelposition)
+            #plt.setp(ax.get_yticklabels(), visible=True)
         return ax
     return plot
 
