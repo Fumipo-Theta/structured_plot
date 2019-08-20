@@ -105,12 +105,12 @@ class Subplot(ISubplot):
         self.option = []
         self.is_second_axes = []
         self.filter_x = False
-        self.title = None
 
         default_axes_style = {
             "title": {
                 "fontsize": 16
             },
+            "title_text":None,
             "cycler": None,
             "xlim": [],
             "ylim": [],
@@ -170,7 +170,7 @@ class Subplot(ISubplot):
         return self.axes_spec
 
     def set_title(self, title=""):
-        self.title = title
+        self.axes_style["title_text"] = title
         return self
 
     def get_first_axis_style(self)->dict:
@@ -183,8 +183,8 @@ class Subplot(ISubplot):
         )[0]
 
     def show_title(self, ax):
-        if self.title is not None:
-            ax.set_title(self.title, **self.axes_style.get("title", {}))
+        if self.axes_style["title_text"] is not None:
+            ax.set_title(self.axes_style["title_text"], **self.axes_style.get("title", {}))
         return ax
 
     def plot(self, ax, test=False):
@@ -362,6 +362,7 @@ class Subplot(ISubplot):
             ytick: dict={},
             xlabel: Optional[str]=None,
             ylabel: Optional[str]=None,
+            title:Optional[str]= None,
             cycler=None,
             within_xlim: bool=False,
             second_axis: bool=False,
@@ -390,6 +391,8 @@ class Subplot(ISubplot):
             List of plot actions.
         xlim, ylim, optional: List[int,float]
             List of numbers for defining limit of xy axis.
+        title, optional: str
+            String of subplot title.
         xscale, yscale, optional: str
             Str of type of axis scale.
             "linear", "log" can be used.
@@ -443,6 +446,7 @@ class Subplot(ISubplot):
             kwargs.get("limit", {}),
             {"xlim": xlim} if xlim is not None else {},
             {"ylim": ylim} if ylim is not None else {},
+            {"title_text": title} if title is not None else {},
         )
 
         if not second_axis:
