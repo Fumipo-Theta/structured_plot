@@ -52,7 +52,7 @@ def contour(
 
     def plot(ax):
         print(kwargs)
-        ax.contourf(_x, _y, _z, **kwargs)
+        ax.contour(_x, _y, _z, **kwargs)
         return ax
 
     return plot
