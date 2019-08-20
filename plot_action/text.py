@@ -1,9 +1,22 @@
 from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, selector_or_literal, Icoordinate_transform
 from .action import DataSource, AxPlot
 
+default_option = {
+    "ha": 'left',
+    "va": 'bottom',
+    "color": "black",
+    "family": None,
+    "fontsize": 10,
+    "rotation": None,
+    "style": None,
+    "xcoordinate": None,  # "data" = None | "axes"
+    "ycoordinate": None,  # "data" = None | "axes"
+    "wrap": False
+}
+
 
 @plot_action(["x", "y", "text"],
-             default_kwargs.get("text"))
+             default_option)
 def text(df: DataSource, x, y, text, *arg,
          xcoordinate=None,
          ycoordinate=None,

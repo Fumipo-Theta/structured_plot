@@ -20,8 +20,6 @@ T = TypeVar("T")
 def filter_dict(ref_keys):
     return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
 
-# %%
-
 
 def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
     d = {}
@@ -35,10 +33,7 @@ def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
     return d, mix_dict
 
 
-# %%
 mix_dict({"xlabel": {"fontsize": 12}}, {"xlim": [0, 1], "xlabel": {}})
-
-# %%
 
 
 def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
@@ -425,10 +420,10 @@ class Subplot(ISubplot):
                     {"xlabel": xlabel} if xlabel is not None else {},
                     {"ylabel": ylabel} if ylabel is not None else {}
                 ),
-                "scale": {
-                    "xscale": xscale,
-                    "yscale": yscale
-                },
+                "scale": dictionary.mix(
+                    {"xscale": xscale} if xscale is not None else {},
+                    {"yscale": yscale} if yscale is not None else {}
+                ),
                 "tick": dictionary.mix(
                     tick,
                     filter_dict([

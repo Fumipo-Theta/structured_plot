@@ -118,7 +118,6 @@ def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->
                 ax.set_xticklabels(labels)
                 plt.setp(ax.get_xticklabels(), visible=True)
         if axis is "y":
-            print(locations, labels)
             if type(locations) in [list, np.ndarray]:
                 ax.set_yticks(locations)
                 #plt.setp(ax.get_yticklabels(), visible=True)
