@@ -8,7 +8,11 @@ import iter_helper as it
 
 @plot_action(["x", "y", "yagg"],
              {
-    **default_kwargs.get("bar"),
+    "norm": False,
+    "width": None,
+    "color": "blue",
+    "alpha": 1,
+    "align": "center",
     "xfactor": None,
     "yfactor": None,
     "legend_labels": None,
@@ -33,24 +37,8 @@ def factor_bar(
     show_factor_ticks=True,
         **kwargs):
     """
-    plot.bar(**presetting)(df, option, **kwargs)(ax)
+    Stacking bar plot.
 
-    df: dict, pandas.DataFrame, numpy.ndarray
-
-    option: dict
-        x:
-        y:
-        agg:
-        **other_option
-
-    presetting, other_option,kwargs:
-        xfactor:
-        yfactor:
-        norm: bool
-        vert: bool
-        legend: dict
-        align: str
-        width:
     """
 
     if len(df) is 0:

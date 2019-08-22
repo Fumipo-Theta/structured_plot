@@ -26,7 +26,7 @@ from matplotlib.pyplot import cm as colormap
 
 from .action import *
 from .axes_style import *
-from .band import xband, yband
+from .band import hband, vband, xband, yband
 from .bar import bar, factor_bar, rose
 from .box import box, factor_box
 from .contour import contour, contourf
@@ -38,7 +38,7 @@ from .hist import hist
 from .imshow import *
 from .line import line
 from .mapping import *
-from .multiple import multiple
+from .multiple import multiple, m
 from .scatter import scatter
 from .text import text
 from .velocity import velocity

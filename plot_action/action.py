@@ -23,6 +23,10 @@ LiteralOrSequencer = Optional[Union[LiteralOrSequence,
                                     Callable[[DataSource], DataSource]]]
 
 
+def stringify_dict(d):
+    return it.reducing(lambda acc, kv: f"{acc}\n{kv[0]}: {kv[1]}")("")(d.items())
+
+
 def plot_action(arg_names: List[str], default_kwargs: dict = {}):
     """
     Generate plot action by hashable object and some parameters, which takes
@@ -76,7 +80,15 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
                 return lambda ax: it.reducing(
                     lambda acc, e: plotter(*e[0], **e[1])(acc))(ax)(arg_and_kwarg)
             return set_data
-        return lambda **kwargs: presetting(kwargs)
+
+        def applier(**kwargs):
+            return presetting(kwargs)
+
+        applier.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
+            + "\n\nPlot options\n" \
+            + it.reducing(lambda acc, e: f"{acc}\n{e}")("")(arg_names)\
+            + stringify_dict(default_kwargs)
+        return applier
     return wrapper
 
 
@@ -304,6 +316,12 @@ _tick_params_each = {
 
 _tick_params_kwargs = {
     **_tick_params_each,
+    "labelsize": 12,
+    "rotation": 0,
+    "which": "both",
+    "direction": "in",
+    "color": "black",
+    "labelcolor": "black",
     "labelbottom": None,
     "labelleft": None,
     "labeltop": None,
@@ -323,7 +341,7 @@ _label_kwargs = {
     "fontsize": 16,
     "fontstyle": "normal",
     "fontweight": "normal",
-    "rotation" : None,
+    "rotation": None,
 }
 
 _line2d_kwargs = {

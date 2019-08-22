@@ -1,9 +1,24 @@
 from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, get_literal_or_series
 from .action import DataSource, AxPlot, SetData, Selector, LiteralOrSequencer
 
+scatter_option = {
+    "c": None,
+    "s": None,
+    "cmap": None,
+    "norm": None,
+    "vmin": None,
+    "vmax": None,
+    "alpha": 1,
+    "marker": "o",
+    "facecolor": None,
+    "edgecolors": "face",
+    "linewidth": None,
+    "linestyle": "-"
+}
+
 
 @plot_action(["x", "y"],
-             {**default_kwargs.get("scatter")})
+             {**scatter_option})
 def scatter(
     data: DataSource,
     x: Selector,

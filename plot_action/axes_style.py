@@ -93,9 +93,25 @@ def set_ylim(df: DataSource, y, *arg, ylim=None, **kwargs)->AxPlot:
     return plot
 
 
+from .artist_options import line2d_option
+
+grid_option = {
+    **line2d_option,
+    "axis": None,
+    "color": 'gray',
+    "linestyle": ':',
+    "linewidth": 1,
+}
+
+
 @plot_action([],
              default_kwargs.get("grid"))
 def set_grid(*arg, axis=None, **kwargs)->AxPlot:
+    """
+    Show grid line.
+
+    axis: "x" | "y" | "both"
+    """
     def plot(ax):
         if axis is None:
             return ax
@@ -104,11 +120,34 @@ def set_grid(*arg, axis=None, **kwargs)->AxPlot:
     return plot
 
 
+tick_option = {
+    "labelsize": 12,
+    "rotation": 0,
+    "which": "both",
+    "direction": "in",
+    "color": "black",
+    "labelcolor": "black",
+    "labelbottom": None,
+    "labelleft": None,
+    "labeltop": None,
+    "labelright": None,
+    "bottom": None,
+    "left": None,
+    "top": None,
+    "right": None
+}
+
+
 @plot_action(["axis"], {
-    **default_kwargs.get("tick_params"),
-    "locations": None, "labels": None
+    **tick_option,
+    "locations": None,
+    "labels": None
 })
 def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->AxPlot:
+    """
+    Show/hide ticks and tick labels.
+    Set tick locations and labels.
+    """
     def plot(ax):
         if axis is "x":
             if type(locations) in [list, np.ndarray]:
@@ -138,6 +177,12 @@ def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->
 @plot_action([],
              {"xscale": None, "yscale": None})
 def axis_scale(*arg, xscale=None, yscale=None):
+    """
+    Set axis scale types.
+
+    xscale: None | "log"
+    yscale: None | "log"
+    """
     def plot(ax):
         if xscale is not None:
             ax.set_xscale(xscale)
@@ -147,9 +192,21 @@ def axis_scale(*arg, xscale=None, yscale=None):
     return plot
 
 
+label_option = {
+    "alpha": 1,
+    "color": "black",
+    "family": ["Noto Sans CJK JP", "sans-serif"],
+    # "fontname" : "sans-serif",
+    "fontsize": 16,
+    "fontstyle": "normal",
+    "fontweight": "normal",
+    "rotation": None,
+}
+
+
 @plot_action(["xlabel", "ylabel"],
              {
-                 **default_kwargs.get("axis_label"),
+                 **label_option,
 })
 def set_label(df: DataSource, xlabel: str, ylabel: str, *arg,
               xlabelposition=None, ylabelposition=None, **kwargs)->AxPlot:
@@ -176,7 +233,7 @@ def set_label(df: DataSource, xlabel: str, ylabel: str, *arg,
     return plot
 
 
-@plot_action(["xlabel"], {**default_kwargs.get("axis_label"), "xlabelposition": None, })
+@plot_action(["xlabel"], {**label_option, "xlabelposition": None, })
 def set_xlabel(df, xlabel: str, *arg, xlabelposition=None, **kwargs)->AxPlot:
     def plot(ax):
         if xlabel is not None:
@@ -192,7 +249,7 @@ def set_xlabel(df, xlabel: str, *arg, xlabelposition=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["ylabel"], {**default_kwargs.get("axis_label"), "ylabelposition": None, })
+@plot_action(["ylabel"], {**label_option, "ylabelposition": None, })
 def set_ylabel(df, ylabel: str, *arg, ylabelposition=None, **kwargs)->AxPlot:
     def plot(ax):
         if ylabel is not None:

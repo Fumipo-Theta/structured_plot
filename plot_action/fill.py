@@ -2,10 +2,19 @@ from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_val
 from .action import DataSource, AxPlot
 
 
+fill_option = {
+    "color": "green",
+    "cmap": None,
+    "alpha": 0.5,
+    "facecolor": None,
+    "hatch": None,
+}
+
+
 @plot_action(["x", "y"],
              {
     "y2": 0,
-    **default_kwargs.get("fill"),
+    **fill_option,
     "color": "blue"
 })
 def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
@@ -28,7 +37,7 @@ def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
 @plot_action(["x", "y"],
              {
     "y2": 0,
-    **default_kwargs.get("fill"),
+    **fill_option,
     "color": "blue"
 })
 def fill(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
