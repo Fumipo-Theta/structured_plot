@@ -110,24 +110,28 @@ class Subplot(ISubplot):
             "title": {
                 "fontsize": 16
             },
-            "title_text":None,
+            "title_text": None,
             "cycler": None,
             "xlim": [],
             "ylim": [],
+            "zlim": [],
             "label": {
                 "fontsize": 16,
             },
             "xlabel": {},
             "ylabel": {},
+            "zlabel": {},
             "scale": {
                 "xscale": None,
                 "yscale": None,
+                "zscale": None,
             },
             "tick": {
                 "labelsize": 14,
             },
             "xtick": {},
             "ytick": {},
+            "ztick": {},
             "grid": {},
             "style": {}
         }
@@ -146,13 +150,16 @@ class Subplot(ISubplot):
             "cycler": None,
             "xlim": [],
             "ylim": [],
+            "zlim": [],
             "label": {},
             "xlabel": {},
             "ylabel": {},
+            "zlabel": {},
             "scale": {},
             "tick": {},
             "xtick": {},
             "ytick": {},
+            "ztick": {},
             "grid": {},
             "style": {}
         }
@@ -184,7 +191,8 @@ class Subplot(ISubplot):
 
     def show_title(self, ax):
         if self.axes_style["title_text"] is not None:
-            ax.set_title(self.axes_style["title_text"], **self.axes_style.get("title", {}))
+            ax.set_title(self.axes_style["title_text"],
+                         **self.axes_style.get("title", {}))
         return ax
 
     def plot(self, ax, test=False):
@@ -256,17 +264,22 @@ class Subplot(ISubplot):
                 plot_action.axis_scale()({}, style["scale"]),
                 plot_action.set_xlim()({}, {"xlim": style["xlim"]}),
                 plot_action.set_ylim()({}, {"ylim": style["ylim"]}),
+                plot_action.set_zlim()({}, {"zlim": style["zlim"]}),
                 plot_action.set_tick_parameters(axis="both")(
                     {}, style["tick"]),
                 plot_action.set_tick_parameters(axis="x")(
                     {}, {**style["tick"], **style["xtick"]}),
                 plot_action.set_tick_parameters(axis="y")(
                     {}, {**style["tick"], **style["ytick"]}),
+                plot_action.set_tick_parameters(axis="z")(
+                    {}, {**style["tick"], **style["ytick"]}),
 
                 plot_action.set_xlabel()(
                     {}, {**style["label"], **style["xlabel"]}),
                 plot_action.set_ylabel()(
                     {}, {**style["label"], **style["ylabel"]}),
+                plot_action.set_zlabel()(
+                    {}, {**style["label"], **style["zlabel"]}),
                 plot_action.set_grid()({}, style["grid"])
             )
         return plotter
@@ -355,14 +368,18 @@ class Subplot(ISubplot):
             option: dict={},
             xlim: Optional[list]=None,
             ylim: Optional[list]=None,
+            zlim: Optional[list]=None,
             xscale: Optional[str]=None,
             yscale: Optional[str]=None,
+            zscale: Optional[str]=None,
             tick: dict={},
             xtick: dict={},
             ytick: dict={},
+            ztick: dict={},
             xlabel: Optional[str]=None,
             ylabel: Optional[str]=None,
-            title:Optional[str]= None,
+            zlabel: Optional[str]=None,
+            title: Optional[str]= None,
             cycler=None,
             within_xlim: bool=False,
             second_axis: bool=False,
@@ -389,17 +406,17 @@ class Subplot(ISubplot):
             Functions for transforming dataframe object prior to plot.
         plot, optional: List[PLotAction]
             List of plot actions.
-        xlim, ylim, optional: List[int,float]
+        xlim, ylim, zlim, optional: List[int,float]
             List of numbers for defining limit of xy axis.
         title, optional: str
             String of subplot title.
-        xscale, yscale, optional: str
+        xscale, yscale, zscale, optional: str
             Str of type of axis scale.
             "linear", "log" can be used.
-        tick, xtick, ytick, optional: dict
+        tick, xtick, ytick, ztick, optional: dict
             Dict defining style of ticks.
-        xlabel, ylabel, optional: str
-            Str for x and y label of axis.
+        xlabel, ylabel, zlabel, optional: str
+            Str label of axis.
         within_xlim, optional: bool
             Flag whether plot only data in xlim.
         second_axis, optinal: bool
@@ -421,11 +438,13 @@ class Subplot(ISubplot):
             {
                 "label": dictionary.mix(
                     {"xlabel": xlabel} if xlabel is not None else {},
-                    {"ylabel": ylabel} if ylabel is not None else {}
+                    {"ylabel": ylabel} if ylabel is not None else {},
+                    {"zlabel": zlabel} if zlabel is not None else {}
                 ),
                 "scale": dictionary.mix(
                     {"xscale": xscale} if xscale is not None else {},
-                    {"yscale": yscale} if yscale is not None else {}
+                    {"yscale": yscale} if yscale is not None else {},
+                    {"zscale": zscale} if zscale is not None else {}
                 ),
                 "tick": dictionary.mix(
                     tick,
@@ -442,10 +461,12 @@ class Subplot(ISubplot):
                 ),
                 "xtick": xtick,
                 "ytick": ytick,
+                "ztick": ztick,
             },
             kwargs.get("limit", {}),
             {"xlim": xlim} if xlim is not None else {},
             {"ylim": ylim} if ylim is not None else {},
+            {"zlim": zlim} if zlim is not None else {},
             {"title_text": title} if title is not None else {},
         )
 
@@ -513,7 +534,8 @@ class Subplot(ISubplot):
 
         new_subplot = type(self)(
             **mix_dict(self.axes_style,
-                       style_kwargs)[0]
+                       style_kwargs)[0],
+            axes_spec=self.axes_spec
         )
 
         new_subplot.diff_second_axes_style = {**self.diff_second_axes_style}

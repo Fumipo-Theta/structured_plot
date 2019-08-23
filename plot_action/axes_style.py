@@ -93,6 +93,30 @@ def set_ylim(df: DataSource, y, *arg, ylim=None, **kwargs)->AxPlot:
     return plot
 
 
+@plot_action(["z"],
+             {"zlim": None})
+def set_zlim(df: DataSource, z, *arg, zlim=None, **kwargs)->AxPlot:
+    """
+    Parameters
+    ----------
+    z
+    """
+    lim = _get_lim_parameter(get_subset()(df, z), zlim)
+
+    def plot(ax):
+        if not hasattr(ax, "get_zlim"):
+            return ax
+
+        if lim is not None:
+            now_lim = ax.get_zlim()
+            next_lim = [None, None]
+            next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
+            next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
+            ax.set_zlim(next_lim)
+        return ax
+    return plot
+
+
 from .artist_options import line2d_option
 
 grid_option = {
@@ -110,7 +134,7 @@ def set_grid(*arg, axis=None, **kwargs)->AxPlot:
     """
     Show grid line.
 
-    axis: "x" | "y" | "both"
+    axis: "x" | "y" | "z" | "both"
     """
     def plot(ax):
         if axis is None:
@@ -164,6 +188,14 @@ def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->
                 ax.set_yticklabels(labels)
                 plt.setp(ax.get_yticklabels(), visible=True)
 
+        if axis is "z":
+            if type(locations) in [list, np.ndarray]:
+                ax.set_zticks(locations)
+                #plt.setp(ax.get_yticklabels(), visible=True)
+            if type(labels) in [list, np.ndarray]:
+                ax.set_zticklabels(labels)
+                plt.setp(ax.get_zticklabels(), visible=True)
+
         if axis is "both":
             ax.tick_params(axis=axis, **kwargs)
         else:
@@ -175,8 +207,8 @@ def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->
 
 
 @plot_action([],
-             {"xscale": None, "yscale": None})
-def axis_scale(*arg, xscale=None, yscale=None):
+             {"xscale": None, "yscale": None, "zscale": None})
+def axis_scale(*arg, xscale=None, yscale=None, zscale=None):
     """
     Set axis scale types.
 
@@ -188,6 +220,8 @@ def axis_scale(*arg, xscale=None, yscale=None):
             ax.set_xscale(xscale)
         if yscale is not None:
             ax.set_yscale(yscale)
+        if zscale is not None:
+            ax.set_zscale(zscale)
         return ax
     return plot
 
@@ -204,12 +238,22 @@ label_option = {
 }
 
 
-@plot_action(["xlabel", "ylabel"],
+@plot_action(["xlabel", "ylabel", "zlabel"],
              {
                  **label_option,
 })
-def set_label(df: DataSource, xlabel: str, ylabel: str, *arg,
-              xlabelposition=None, ylabelposition=None, **kwargs)->AxPlot:
+def set_label(
+    df: DataSource,
+    xlabel: str,
+    ylabel: str,
+    zlabel: str,
+    *arg,
+    xlabelposition=None,
+    ylabelposition=None,
+    zlabelposition=None,
+    **kwargs
+)->AxPlot:
+
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
@@ -229,6 +273,16 @@ def set_label(df: DataSource, xlabel: str, ylabel: str, *arg,
         if ylabelposition is not None:
             ax.yaxis.set_label_position(ylabelposition)
             plt.setp(ax.get_yticklabels(), visible=True)
+
+        if zlabel is not None:
+            ax.set_zlabel(
+                zlabel,
+                **kwargs
+            )
+
+        if zlabelposition is not None:
+            ax.zaxis.set_label_position(zlabelposition)
+            plt.setp(ax.get_zticklabels(), visible=True)
         return ax
     return plot
 
@@ -259,6 +313,21 @@ def set_ylabel(df, ylabel: str, *arg, ylabelposition=None, **kwargs)->AxPlot:
             )
         if ylabelposition is not None:
             ax.yaxis.set_label_position(ylabelposition)
+            #plt.setp(ax.get_yticklabels(), visible=True)
+        return ax
+    return plot
+
+
+@plot_action(["zlabel"], {**label_option, "zlabelposition": None, })
+def set_zlabel(df, zlabel: str, *arg, zlabelposition=None, **kwargs)->AxPlot:
+    def plot(ax):
+        if zlabel is not None:
+            ax.set_zlabel(
+                zlabel,
+                **kwargs
+            )
+        if zlabelposition is not None:
+            ax.zaxis.set_label_position(zlabelposition)
             #plt.setp(ax.get_yticklabels(), visible=True)
         return ax
     return plot

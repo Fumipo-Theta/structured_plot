@@ -36,10 +36,10 @@ from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist
 from .imshow import *
-from .line import line
+from .line import line, line3d
 from .mapping import *
 from .multiple import multiple, m
-from .scatter import scatter
+from .scatter import scatter, scatter3d
 from .text import text
 from .velocity import velocity
 from .vhlines import vlines, hlines
