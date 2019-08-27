@@ -61,16 +61,16 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
     def wrapper(plotter: PlotAction)->Presetting:
 
         @functools.wraps(plotter)
-        def presetting(setting: dict = {}, verbose:bool=False, **setting_kwargs)->SetData:
+        def presetting(direct_setting: dict = {}, verbose:bool=False, **direct_setting_kwargs)->SetData:
 
-            def set_data(data_source: DataSource, option: dict = {})->AxPlot:
+            def set_data(data_source: DataSource, bload_casted_option: dict = {})->AxPlot:
 
                 list_of_entry = to_flatlist({
                         "data": data_source,
                         **default_kwargs,
-                        **setting,
-                        **setting_kwargs,
-                        **option
+                        **bload_casted_option,
+                        **direct_setting,
+                        **direct_setting_kwargs,
                         })
 
                 valid_args = list(map(arg_filter, list_of_entry))
