@@ -3,7 +3,7 @@ from .action import DataSource, AxPlot, SetData, Selector, LiteralOrSequencer
 
 scatter_option = {
     "c": None,
-    "s": None,
+    "s": 20,
     "cmap": None,
     "norm": None,
     "vmin": None,
@@ -17,27 +17,39 @@ scatter_option = {
 }
 
 
-@plot_action(["x", "y"],
+@plot_action(["x", "y", "z"],
              {**scatter_option})
 def scatter(
     data: DataSource,
-    x: Selector,
-    y: Selector,
     *arg,
     c: LiteralOrSequencer=None,
-    s: LiteralOrSequencer=None,
+    s: LiteralOrSequencer=20,
     cmap=None,
     vmin=None,
     vmax=None,
     norm=None,
     **kwargs
 )->AxPlot:
+    """
+    scatter(x, y, [z], **kwargs)
+
+    Scatter plot in 2D or 3D coordinate.
+
+    In 2D plot:
+        x
+        y
+
+    In 3D plot:
+        x
+        y
+        z
+    """
 
     if len(data) is 0:
         return lambda ax: ax
 
-    _x = get_subset()(data, x)
-    _y = get_subset()(data, y)
+    plot_data = [get_subset()(data, selector)
+                 for selector in filter(lambda e: e is not None, arg)]
 
     colors = get_literal_or_series(c, data)
     sizes = get_literal_or_series(s, data)
@@ -52,7 +64,7 @@ def scatter(
     }
 
     def plot(ax):
-        ax.scatter(_x, _y, **new_kwargs)
+        ax.scatter(*plot_data, **new_kwargs)
         return ax
     return plot
 

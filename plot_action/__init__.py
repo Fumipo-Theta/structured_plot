@@ -24,8 +24,15 @@ text
 """
 from matplotlib.pyplot import cm as colormap
 
-from .action import *
-from .axes_style import *
+from .action import plot_action, generate_arg_and_kwags, get_subset, get_literal_or_series, selector_or_literal
+from .action import DataSource, Ax, AxPlot, PlotAction, SetData, Presetting, Scalar, Selector, LiteralOrSequence, LiteralOrSequencer
+from .axes_style import set_cycler
+from .axes_style import set_xlim, set_ylim, set_zlim
+from .axes_style import set_grid
+from .axes_style import set_tick_parameters
+from .axes_style import axis_scale
+from .axes_style import set_label, set_xlabel, set_ylabel, set_zlabel
+from .axes_style import twinx
 from .band import hband, vband, xband, yband
 from .bar import bar, factor_bar, rose
 from .box import box, factor_box
@@ -36,10 +43,10 @@ from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist
 from .imshow import *
-from .line import line, line3d
+from .line import line
 from .mapping import *
 from .multiple import multiple, m
-from .scatter import scatter, scatter3d
+from .scatter import scatter
 from .text import text
 from .velocity import velocity
 from .vhlines import vlines, hlines

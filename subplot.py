@@ -18,22 +18,37 @@ T = TypeVar("T")
 
 
 def filter_dict(ref_keys):
+    """
+    Filter items in a dict by reference list of keys.
+    """
     return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
 
 
-def mix_dict(target: dict, mix_dict: dict, consume: bool=False)->dict:
+def mix_dict(target: dict, mixing: dict, consume: bool=False)->dict:
+    """
+    Overwrite items by only the key in the old dict.
+
+    """
     d = {}
     for key in target.keys():
         if type(target[key]) is dict:
             d[key] = {
-                **target[key], **(mix_dict.pop(key, {}) if consume else mix_dict.get(key, {}))}
+                **target[key], **(mixing.pop(key, {}) if consume else mixing.get(key, {}))}
         else:
-            d[key] = mix_dict.pop(
-                key, target[key]) if consume else mix_dict.get(key, target[key])
-    return d, mix_dict
+            d[key] = mixing.pop(
+                key, target[key]) if consume else mixing.get(key, target[key])
+    return d, mixing
 
 
-mix_dict({"xlabel": {"fontsize": 12}}, {"xlim": [0, 1], "xlabel": {}})
+assert(mix_dict(
+    {
+        "xlabel": {"fontsize": 12}
+    },
+    {
+        "xlim": [0, 1],
+        "xlabel": {}
+    }
+) == ({'xlabel': {'fontsize': 12}}, {'xlim': [0, 1], 'xlabel': {}}))
 
 
 def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
@@ -43,33 +58,50 @@ def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
     return a if type(a) is Duplicated else Duplicated(a)
 
 
+def get_from_duplicated(it: Duplicated, i: int, default=None):
+    """
+    Take ith item in Duplicated.
+    If length of Duplicated is 0, default value is used.
+    """
+    if len(it) is 0:
+        return default
+    return it[i]
+
+
 class Subplot(ISubplot):
     """
-    Csvファイルを読み込み, その中のデータを変形し, プロットするメソッドを返す.
+    dict, pandas.DataFrame, ファイルを指定し, プロット方法とプロット設定を指定する.
     Figureオブジェクトに登録することで最終的にプロットが作成される.
 
     Example
     -------
     fig=Figure():
 
-    fig.add_subplot(
-        Subplot.create(axStyle)\
-            .register(
-                data=getFileList(pattern1,pattern2,...)(directory),
+    line_and_scatter_plot = Subplot(axStyle)\
+            .add(
+                data=PathList.match(pattern1,pattern2,...)(directory),
                 dataInfo={
                     "header": 3
                 },
-                plot=[plot.scatter(),plot.line()],
-                xlim=["2018/08/10 00:00:00","2018/08/19 00:00:00"],
-                y="Salinity",
+                plot=[plot_action.scatter(),plot_action.line()],
+                x="x_column_name_in_data",
+                y="y_column_name_in_data",
                 ylim=[25,35],
-                ylabel="Salinity"
+                xlabel=r"$x$",
+                ylabel="Y axis label"
             )
-    )
+
+    fig.add_subplot(
+        line_and_scatter_plot
+    ).show(size=(6,6))
     """
 
     @staticmethod
     def create_empty_space():
+        """
+        Create empty space.
+        Any plot and axis are not drawn.
+        """
         return Subplot().add(
             plot=[lambda df, opt: Subplot.__noDataAx]
         )
@@ -79,7 +111,7 @@ class Subplot(ISubplot):
 
     def __add__(self, subplot):
         new_subplot = self.forked()
-        for i in range(subplot.length):
+        for i in range(len(subplot)):
             new_subplot.add(
                 **dictionary.mix(
                     {
@@ -95,6 +127,16 @@ class Subplot(ISubplot):
             )
         return new_subplot
 
+    def __len__(self):
+        return self.length
+
+    def __repr__(self):
+        return f"""Subplot with length {len(self)}
+        Axes spec: {self.axes_spec}
+        First axis style: {self.get_first_axis_style()}
+        Second axis style: {self.get_second_axis_style()}
+        """
+
     def __init__(self, *style_dict, axes_spec={}, **style):
         self.axes_spec = axes_spec
         self.data = []
@@ -105,6 +147,7 @@ class Subplot(ISubplot):
         self.option = []
         self.is_second_axes = []
         self.filter_x = False
+        self._isTest = False
 
         default_axes_style = {
             "title": {
@@ -171,12 +214,13 @@ class Subplot(ISubplot):
         # print(self.axes_style)
 
         self.length = 0
-        self.plotter = Subplot.Iplotter()
+        self.plotter = Subplot.Iplotter(plot_action)
 
     def get_axes_spec(self):
         return self.axes_spec
 
     def set_title(self, title=""):
+        print("set_title() is deprecated. Use title option in add() method.")
         self.axes_style["title_text"] = title
         return self
 
@@ -219,7 +263,7 @@ class Subplot(ISubplot):
 
         first_plot_actions = map(
             self.__getPlotAction,
-            filter(lambda i: not self.is_second_axes[i], range(self.length))
+            filter(lambda i: not self.is_second_axes[i], range(len(self)))
         )
 
         first_axis_style = self.get_first_axis_style()
@@ -234,7 +278,7 @@ class Subplot(ISubplot):
             second_axis_actions = map(
                 self.__getPlotAction,
                 filter(
-                    lambda i: self.is_second_axes[i], range(self.length))
+                    lambda i: self.is_second_axes[i], range(len(self)))
             )
 
             second_xaxis_style = {**self.get_second_axis_style()}
@@ -253,10 +297,17 @@ class Subplot(ISubplot):
             return ax1
 
     @staticmethod
-    def Iplotter():
+    def Iplotter(plot_action):
         def plotter(actions, style):
             """
+            Plot actions for setting axes style
 
+            * cycler
+            * axis scale
+            * axis range
+            * axis ticks
+            * axis labels
+            * axis grids
             """
             return pip(
                 plot_action.set_cycler(style["cycler"]),
@@ -288,7 +339,9 @@ class Subplot(ISubplot):
         dfs: Duplicated = self.read(i)
         opt = self.get_option(i)
 
-        if len(dfs) == 0 or all(map(lambda df: len(df) is 0, dfs.args)):
+        if len(dfs) == 0:
+            return Subplot.__noDataAx
+        if all(map(lambda df: len(df) is 0, dfs.args)):
             return Subplot.__noDataAx
 
         return lambda ax: pip(
@@ -310,17 +363,12 @@ class Subplot(ISubplot):
             it.reducing(lambda acc, e: acc if acc > e else e)(0)
         )([data, meta, default_transformers, data_transformers])
 
-        def get_with_duplicate(it: Duplicated, i, default=None):
-            if len(it) is 0:
-                return default
-            return it[i]
-
         dfs = []
         for j in range(max_len):
-            d = get_with_duplicate(data, j, {})
-            m = get_with_duplicate(meta, j, {})
-            def_trans = get_with_duplicate(default_transformers, j, [])
-            trans = get_with_duplicate(data_transformers, j, [])
+            d = get_from_duplicated(data, j, {})
+            m = get_from_duplicated(meta, j, {})
+            def_trans = get_from_duplicated(default_transformers, j, [])
+            trans = get_from_duplicated(data_transformers, j, [])
 
             loader = ISubplot.IDataLoader(d, self.isTest())
 
@@ -540,7 +588,7 @@ class Subplot(ISubplot):
 
         new_subplot.diff_second_axes_style = {**self.diff_second_axes_style}
 
-        for i in range(self.length):
+        for i in range(len(self)):
             new_subplot.add(
                 **dictionary.mix(
                     {

@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.transforms
+import functools
 from typing import Union, List, Tuple, TypeVar, Callable, NewType, Optional
 from func_helper import pip
 import iter_helper as it
@@ -23,9 +24,19 @@ LiteralOrSequencer = Optional[Union[LiteralOrSequence,
                                     Callable[[DataSource], DataSource]]]
 
 
+def iterable(i):
+    return hasattr(i, "__iter__")
+
 def stringify_dict(d):
     return it.reducing(lambda acc, kv: f"{acc}\n{kv[0]}: {kv[1]}")("")(d.items())
 
+
+def diff_of_list(current, reference):
+    return list(filter(lambda e: e not in reference, current))
+
+def notify_unsued_options(l):
+    if len(l) > 0:
+        print(f"Option not used: {l}")
 
 def plot_action(arg_names: List[str], default_kwargs: dict = {}):
     """
@@ -49,46 +60,55 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
 
     def wrapper(plotter: PlotAction)->Presetting:
 
-        def presetting(setting: dict = {}, **setting_kwargs)->SetData:
-            def set_data(data_source: DataSource, option: dict = {},  **option_kwargs)->AxPlot:
-                """
-                Parameters
-                ----------
-                df: pandas.DataFrame | dict
-                option: dict, optional
-                    {
-                        "x" : "x_name",
-                        "y" : ["y1", "y2"],
-                        "ylim" : (None,10),
-                        "ylabel" : "Y",
-                        "linewidth" : [1,1.5]
-                    }
-                kwargs: parameters corresponding to items of option.
-                """
-                list_of_entry = to_flatlist(
-                    {"data": data_source, **default_kwargs,     **setting, **setting_kwargs, **option,  **option_kwargs})
-                # print(list_of_entry)
+        @functools.wraps(plotter)
+        def presetting(setting: dict = {}, verbose:bool=False, **setting_kwargs)->SetData:
+
+            def set_data(data_source: DataSource, option: dict = {})->AxPlot:
+
+                list_of_entry = to_flatlist({
+                        "data": data_source,
+                        **default_kwargs,
+                        **setting,
+                        **setting_kwargs,
+                        **option
+                        })
+
+                valid_args = list(map(arg_filter, list_of_entry))
+                valid_kwargs = list(map(kwarg_filter, list_of_entry))
+
 
                 arg_and_kwarg = generate_arg_and_kwags()(
-                    # as_DataFrame(data_source),
-                    # data_source,
-                    list(map(arg_filter, list_of_entry)),
-                    list(map(kwarg_filter, list_of_entry))
+                    valid_args,
+                    valid_kwargs
                 )
+
+                if verbose:
+                    print(plotter.__name__)
+                    print(it.reducing(lambda acc,e: acc+f"args: {e[0]}\nKwargs: {e[1]}\n\n")("")(arg_and_kwarg))
 
                 # return plot action
                 return lambda ax: it.reducing(
-                    lambda acc, e: plotter(*e[0], **e[1])(acc))(ax)(arg_and_kwarg)
+                    lambda acc_ax, e: plotter(*e[0], **e[1])(acc_ax))(ax)(arg_and_kwarg)
+
+            set_data.__doc__ = f"""
+                Prepere plot operation by Ax instance.
+
+                Parameters
+                ----------
+                data_source: DataSource
+
+                {arg_names}
+                {default_kwargs}
+                """
             return set_data
 
-        def applier(**kwargs):
-            return presetting(kwargs)
 
-        applier.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
-            + "\n\nPlot options\n" \
+        # Enable refer the original docstrings
+        presetting.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
+            + "\n\nParameters" \
             + it.reducing(lambda acc, e: f"{acc}\n{e}")("")(arg_names)\
             + stringify_dict(default_kwargs)
-        return applier
+        return presetting
     return wrapper
 
 
@@ -106,7 +126,6 @@ def generate_arg_and_kwags():
     Setup positional arguments and keyword arguments for plotter.
     """
     def gen_func(
-        # df: DataSource,
         option: List[list],
         style: List[dict]
     )->List[Tuple[list, dict]]:
@@ -141,6 +160,8 @@ def get_subset(use_index=True)\
                 return k
             elif callable(k):
                 return k(df)
+            elif iterable(k):
+                return k
             else:
                 return df[k]
 
@@ -151,6 +172,8 @@ def get_subset(use_index=True)\
                 return k(df)
             elif type(k) in [int, float]:
                 return k
+            elif iterable(k):
+                return k
             else:
                 return df
 
@@ -160,6 +183,8 @@ def get_subset(use_index=True)\
             elif callable(k):
                 return k(df)
             elif type(k) in [int, float]:
+                return k
+            elif iterable(k):
                 return k
             else:
                 return df

@@ -28,7 +28,7 @@ fill_option = {
 
 @plot_action([],
              {**fill_option, "ypos": None})
-def hband(*arg, ypos=None, **kwargs)->AxPlot:
+def hband(df, *arg, ypos=None, **kwargs)->AxPlot:
     """
     Plot a horizontal band or line.
 
@@ -41,18 +41,23 @@ def hband(*arg, ypos=None, **kwargs)->AxPlot:
     ypos = [0,1]         line at 0, 1
     ypos = [0,[0,1]]     line at 0 and band between 0,1
     ypos = [[0,1],[2,3]] band between 0,1 and 2,3
+    ypos = zip([0,2],[1,3])   band between 0,1 and 2,3
+    ypos = lambda df: df["y"] line at y in data source
+    ypos = "y"                line at y in data source
     """
 
     def plot(ax):
 
-        if not iterable(ypos):
+        _ypos = get_subset()(df, ypos)
+
+        if not iterable(_ypos):
             _kwargs = dict(
                 filter(lambda kv: kv[0] in axline_option, kwargs.items())
             )
-            ax.axhline(ypos, **_kwargs)
+            ax.axhline(_ypos, **_kwargs)
 
         else:
-            for item in ypos:
+            for item in _ypos:
                 if iterable(item):
                     if len(item) >= 2:
                         ax.fill(
@@ -84,12 +89,11 @@ def hband(*arg, ypos=None, **kwargs)->AxPlot:
 
 
 xband = hband
-xband.__doc__ = "xband is deprecated. Use hband. "
 
 
 @plot_action([],
              {**fill_option, "xpos": None})
-def vband(*arg, xpos=None, **kwargs)->AxPlot:
+def vband(df, *arg, xpos=None, **kwargs)->AxPlot:
     """
     Plot a vertical band or line.
 
@@ -102,17 +106,21 @@ def vband(*arg, xpos=None, **kwargs)->AxPlot:
     xpos = [0,1]         line at 0, 1
     xpos = [0,[0,1]]     line at 0 and band between 0,1
     xpos = [[0,1],[2,3]] band between 0,1 and 2,3
+    xpos = zip([0,2],[1,3])   band between 0,1 and 2,3
+    xpos = lambda df: df["x"] line at x in data source
     """
     def plot(ax):
 
-        if not iterable(xpos):
+        _xpos = get_subset()(df, xpos)
+
+        if not iterable(_xpos):
             _kwargs = dict(
                 filter(lambda kv: kv[0] in axline_option, kwargs.items())
             )
-            ax.axvline(xpos, **_kwargs)
+            ax.axvline(_xpos, **_kwargs)
 
         else:
-            for item in xpos:
+            for item in _xpos:
                 if iterable(item):
                     if len(item) >= 2:
                         ax.fill(
@@ -143,4 +151,3 @@ def vband(*arg, xpos=None, **kwargs)->AxPlot:
 
 
 yband = vband
-yband.__doc__ = "yband is deprecated. Use vband."

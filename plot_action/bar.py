@@ -39,6 +39,21 @@ def factor_bar(
     """
     Stacking bar plot.
 
+    xfactor, yfactor:
+        List of factor values or function generate it from dataframe.
+        xfactor is used for grouping x axis variable.
+        yfactor is used for grouping stacking variable.
+    yagg:
+        Function of aggrigating operation.
+
+    factor_bar(
+        x="group_column",
+        xfactor=xfactors,
+        y="stack_column",
+        yfactor=yfactors,
+        yagg=lambda group: group.count()
+    )
+
     """
 
     if len(df) is 0:
@@ -183,23 +198,12 @@ def bar(
     show_factor_ticks=True,
         **kwargs):
     """
-    plot.bar(**presetting)(df, option, **kwargs)(ax)
+    Plot bars.
 
-    df: dict, pandas.DataFrame, numpy.ndarray
-
-    option: dict
-        x:
-        y:
-        agg:
-        **other_option
-
-    presetting, other_option,kwargs:
-        xfactor:
-        norm: bool
-        vert: bool
-        legend: dict
-        align: str
-        width:
+    xfactor:
+        List of factor values or function generate it from dataframe.
+    yagg:
+        Function for aggligating y factor.
     """
 
     stack_factor = y if type(y) is list else [y]
