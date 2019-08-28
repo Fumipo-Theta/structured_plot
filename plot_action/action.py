@@ -38,7 +38,7 @@ def notify_unsued_options(l):
     if len(l) > 0:
         print(f"Option not used: {l}")
 
-def plot_action(arg_names: List[str], default_kwargs: dict = {}):
+def plot_action(arg_names: List[str], default_settings: dict = {}):
     """
     Generate plot action by hashable object and some parameters, which takes
         matplotlib.pyplot.Axes.subplot and return it.
@@ -56,20 +56,35 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
     callable: (kwargs -> df, dict, kwargs) -> (ax -> ax)
     """
     arg_filter = get_values_by_keys(["data"]+arg_names, None)
-    kwarg_filter = filter_dict(default_kwargs.keys())
+    kwarg_filter = filter_dict(default_settings.keys())
 
     def wrapper(plotter: PlotAction)->Presetting:
 
         @functools.wraps(plotter)
-        def presetting(direct_setting: dict = {}, verbose:bool=False, **direct_setting_kwargs)->SetData:
+        def presetting(direct_settings: dict = {}, verbose:bool=False, **direct_setting_kwargs)->SetData:
 
-            def set_data(data_source: DataSource, bload_casted_option: dict = {})->AxPlot:
+            def set_data(data_source: DataSource, bloadcasted_settings: dict = {})->AxPlot:
 
+                """
+                **Priority of plot options**
+
+                Detail options override bloadcasted ones.
+
+                1. direct_setting_kwargs
+                    Dictionary passed to PlotAction
+                2. direct_settings
+                    Keyword arguments passed to PlotAction
+                3. bloadcasted_settings
+                    Dictionary passed from ISubplot instance
+                4. default_settings
+                    Dictionary passed to plot_action decorator
+
+                """
                 list_of_entry = to_flatlist({
                         "data": data_source,
-                        **default_kwargs,
-                        **bload_casted_option,
-                        **direct_setting,
+                        **default_settings,
+                        **bloadcasted_settings,
+                        **direct_settings,
                         **direct_setting_kwargs,
                         })
 
@@ -84,7 +99,7 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
 
                 if verbose:
                     print(plotter.__name__)
-                    print(it.reducing(lambda acc,e: acc+f"args: {e[0]}\nKwargs: {e[1]}\n\n")("")(arg_and_kwarg))
+                    print(it.reducing(lambda acc,e: acc+f"args: {e[0]}\nkwargs: {e[1]}\n\n")("")(arg_and_kwarg))
 
                 # return plot action
                 return lambda ax: it.reducing(
@@ -98,7 +113,7 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
                 data_source: DataSource
 
                 {arg_names}
-                {default_kwargs}
+                {default_settings}
                 """
             return set_data
 
@@ -107,7 +122,7 @@ def plot_action(arg_names: List[str], default_kwargs: dict = {}):
         presetting.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
             + "\n\nParameters" \
             + it.reducing(lambda acc, e: f"{acc}\n{e}")("")(arg_names)\
-            + stringify_dict(default_kwargs)
+            + stringify_dict(default_settings)
         return presetting
     return wrapper
 

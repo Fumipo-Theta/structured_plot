@@ -26,6 +26,9 @@ from matplotlib.pyplot import cm as colormap
 
 from .action import plot_action, generate_arg_and_kwags, get_subset, get_literal_or_series, selector_or_literal
 from .action import DataSource, Ax, AxPlot, PlotAction, SetData, Presetting, Scalar, Selector, LiteralOrSequence, LiteralOrSequencer
+
+from .artist_options import line2d_option
+
 from .axes_style import set_cycler
 from .axes_style import set_xlim, set_ylim, set_zlim
 from .axes_style import set_grid
