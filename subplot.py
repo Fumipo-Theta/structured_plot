@@ -103,6 +103,7 @@ class Subplot(ISubplot):
         Any plot and axis are not drawn.
         """
         return Subplot().add(
+            data={},
             plot=[lambda df, opt: Subplot.__noDataAx]
         )
 

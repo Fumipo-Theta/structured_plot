@@ -1,7 +1,8 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, selector_or_literal, Icoordinate_transform
+from .action import plot_action,  get_subset, selector_or_literal, Icoordinate_transform
 from .action import DataSource, AxPlot
 
 default_option = {
+    "text": None,
     "ha": 'left',
     "va": 'bottom',
     "color": "black",
@@ -15,19 +16,41 @@ default_option = {
 }
 
 
-@plot_action(["x", "y", "text"],
+@plot_action(["x", "y", "z"],
              default_option)
-def text(df: DataSource, x, y, text, *arg,
+def text(df: DataSource, *arg,
          xcoordinate=None,
          ycoordinate=None,
          **kwargs):
-    _x = selector_or_literal(df, x)
-    _y = selector_or_literal(df, y)
-    _text = selector_or_literal(df, text)
+    """
+    Plot text on the graph.
+
+    Parameters
+    ----------
+    x, y, [z]: Selector
+        Text position.
+    text: Selector
+        Text content.
+
+    xcoordinate: "data" | "axes"
+    ycoordinate: "data" | "axes"
+        Use coordinate based on data ar axes.
+        Default value is "data"
+    """
+
+    t = kwargs.pop("text", None)
+    if t is None:
+        raise Exception("text parameter is required !")
+
+    positions = [get_subset()(df, selector) for selector in arg]
+    _text = get_subset()(df, t)
 
     def plot(ax):
-        for x, y, t in zip(_x, _y, _text):
+        zipped = zip(*positions, _text) \
+            if hasattr(ax, "set_zlim") else zip(*positions[0:-1], _text)
+
+        for _arg in zipped:
             transform = Icoordinate_transform(ax, xcoordinate, ycoordinate)
-            ax.text(x, y, t, transform=transform, **kwargs)
+            ax.text(*_arg, transform=transform, **kwargs)
         return ax
     return plot

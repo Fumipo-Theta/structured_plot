@@ -41,8 +41,14 @@ class Subgrid:
             "sharey": self.sharey.get_ax() if type(self.sharey) is Subgrid else None
         }
 
-    def set_axes_option(self, **kwd):
-        self.axes_kwargs = kwd
+    def set_axes_option(self, **kwargs):
+        """
+        Parameters
+        ----------
+        kwargs:
+            Compatible for figure.add_axes(**kwargs)
+        """
+        self.axes_kwargs = kwargs
 
     def get_axes_option(self):
         return self.axes_kwargs
