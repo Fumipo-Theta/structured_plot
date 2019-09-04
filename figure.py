@@ -192,12 +192,14 @@ class Figure:
                         order=None,
                         padding={},
                         test=False,
+                        verbose=False,
                         **kwargs):
         """
 
         """
-        print(layout)
-        print(self.get_subplot_names())
+        if verbose:
+            print(layout)
+            print(self.get_subplot_names())
         # Transfer axes generating option from ISubplot to Subgrid
         for sg, subplot in zip(
             layout.get_subgrids(
