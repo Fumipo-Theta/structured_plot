@@ -5,6 +5,9 @@ from func_helper import identity
 import dataframe_helper as dataframe
 from iter_helper import DuplicateLast as Duplicated
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
 
 class SubplotTime(Subplot):
     """
