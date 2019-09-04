@@ -3,7 +3,7 @@ line2d_option = {
     "animated": False,
     "antialiased": True,
     "clip_box": None,
-    "clip_on": False,
+    "clip_on": True,
     "clip_path": None,
     "color": None,
     "contains": None,
