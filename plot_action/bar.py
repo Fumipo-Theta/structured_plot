@@ -1,12 +1,12 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor, get_literal_or_series
-from .action import DataSource, AxPlot
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor, get_literal_or_series
+from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
 from func_helper import pip
 import iter_helper as it
 
 
-@plot_action(["x", "y", "yagg"],
+@gen_action(["data","x", "y", "yagg"],
              {
     "norm": False,
     "width": None,
@@ -21,7 +21,7 @@ import iter_helper as it
     "show_factor_ticks": True,
 })
 def factor_bar(
-    df: DataSource,
+    data: DataSource,
     x,  # factor1 selector
     y: str,  # stack factor selector
     yagg,  # aggregate
@@ -56,21 +56,22 @@ def factor_bar(
 
     """
 
-    if len(df) is 0:
+    if len(data) is 0:
         return lambda ax: ax
 
     if type(y) is list:
-        return bar(x=x, y=y,
+        return bar(
+                   x=x, y=y,
                    yagg=yagg, xfactor=xfactor,
                    norm=norm, vert=vert,
                    legend_labels=legend_labels, legend=legend,
-                   **kwargs)(df)
+                   **kwargs)(data)
 
     """
     1. stacking bar plotのstackしていくgroupingをつくる
     """
-    stack_series, stack_factor, _ = Iget_factor(df, y, yfactor)
-    stack_group = df.groupby(
+    stack_series, stack_factor, _ = Iget_factor(data, y, yfactor)
+    stack_group = data.groupby(
         pd.Categorical(
             stack_series,
             ordered=True,
@@ -89,7 +90,7 @@ def factor_bar(
 
     stack_bars = []
     for stack_name in stack_factor:
-        subset = df.loc[stack_group.groups[stack_name]]
+        subset = data.loc[stack_group.groups[stack_name]]
 
         x_factor_series, x_factor, position = Iget_factor(subset, x, xfactor)
 
@@ -174,7 +175,7 @@ def factor_bar(
     return plot
 
 
-@plot_action(["x", "y", "yagg"],
+@gen_action(["data","x", "y", "yagg"],
              {
     **default_kwargs.get("bar"),
     "xfactor": None,
@@ -184,7 +185,7 @@ def factor_bar(
     "show_factor_ticks": True,
 })
 def bar(
-    df: DataSource,
+    data: DataSource,
     x,  # factor1 selector
     y: str,  # stack factor selector
     yagg,  # aggregate
@@ -209,7 +210,7 @@ def bar(
     stack_factor = y if type(y) is list else [y]
     stack_bars = []
     for stack_name in stack_factor:
-        subset = df
+        subset = data
 
         x_factor_series, x_factor, position = Iget_factor(subset, x, xfactor)
 
@@ -295,8 +296,8 @@ def bar(
     return plot
 
 
-@plot_action(
-    ["x", "y", "yagg"],
+@gen_action(
+    ["data","x", "y", "yagg"],
     {
         **default_kwargs.get("bar"),
         "xfactor": None,
@@ -304,7 +305,7 @@ def bar(
     }
 )
 def rose(
-    df: DataSource,
+    data: DataSource,
     x,  # factor1 selector
     y: str,  # stack factor selector
     yagg,  # aggregate
@@ -316,9 +317,9 @@ def rose(
     norm=False,
     **kwargs
 ):
-    x_factor_series, x_factor, position = Iget_factor(df, x, xfactor)
+    x_factor_series, x_factor, position = Iget_factor(data, x, xfactor)
 
-    x_group = df.groupby(
+    x_group = data.groupby(
         pd.Categorical(
             x_factor_series,
             ordered=True,
@@ -327,7 +328,7 @@ def rose(
     )
 
     subset_for_x_factor = [
-        df.loc[x_group.groups[xfname]]
+        data.loc[x_group.groups[xfname]]
         for xfname in x_factor
     ]
 

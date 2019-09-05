@@ -1,5 +1,5 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
-from .action import DataSource, AxPlot
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from ..type_set import DataSource, PlotAction
 
 
 fill_option = {
@@ -11,13 +11,13 @@ fill_option = {
 }
 
 
-@plot_action(["x", "y"],
-             {
+@gen_action(["data", "x", "y"],
+            {
     "y2": 0,
     **fill_option,
     "color": "blue"
 })
-def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
+def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->PlotAction:
     if len(data) is 0:
         return lambda ax: ax
 
@@ -34,13 +34,13 @@ def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["x", "y"],
-             {
+@gen_action(["data", "x", "y"],
+            {
     "y2": 0,
     **fill_option,
     "color": "blue"
 })
-def fill(data, x, y, y2=0, cmap=None, **kwargs)->AxPlot:
+def fill(data, x, y, y2=0, cmap=None, **kwargs)->PlotAction:
     if len(data) is 0:
         return lambda ax: ax
 

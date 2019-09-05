@@ -1,12 +1,12 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
-from .action import DataSource, AxPlot
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from ..type_set import DataSource, PlotAction
 from typing import Union, List
 import pandas as pd
 
 
-@plot_action(["y"],
-             default_kwargs.get("box"))
-def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->AxPlot:
+@gen_action(["y"],
+            default_kwargs.get("box"))
+def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->PlotAction:
     """
     Generate box plots for indicated columns.
     """
@@ -23,19 +23,19 @@ def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["x", "y"],
-             {**default_kwargs.get("box"), "xfactor": None})
-def factor_box(df: DataSource, x, y, *arg, xfactor=None, **kwargs)->AxPlot:
+@gen_action(["data", "x", "y"],
+            {**default_kwargs.get("box"), "xfactor": None})
+def factor_box(data: DataSource, x, y, xfactor=None, **kwargs)->PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
 
     """
-    _factor_series, _factor, position = Iget_factor(df, x, xfactor)
+    _factor_series, _factor, position = Iget_factor(data, x, xfactor)
     _factor_detector = pd.Categorical(
         _factor_series, ordered=True, categories=_factor)
 
-    _group = df.groupby(_factor_detector)
-    _data_without_nan = [df.loc[_group.groups[fname]][y].dropna()
+    _group = data.groupby(_factor_detector)
+    _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
                          for fname in _factor]
 
     def plot(ax):

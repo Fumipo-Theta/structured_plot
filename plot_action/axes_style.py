@@ -1,5 +1,5 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset
-from .action import DataSource, AxPlot
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset
+from ..type_set import DataSource, PlotAction
 from typing import Optional
 import numpy as np
 import pandas as pd
@@ -18,26 +18,26 @@ def set_cycler(cycler=None):
     return setter
 
 
-def _get_lim(df: DataSource, lim_list: Optional[list]):
+def _get_lim(data: DataSource, lim_list: Optional[list]):
     try:
         if lim_list is not None and len(lim_list) >= 2:
             lim = [*lim_list]
             if lim[0] is None:
-                lim[0] = np.min(df.min())
+                lim[0] = np.min(data.min())
             if lim[1] is None:
-                lim[1] = np.max(df.max())
+                lim[1] = np.max(data.max())
             return lim
         else:
             return [
-                np.min(df.min()),
-                np.max(df.max())
+                np.min(data.min()),
+                np.max(data.max())
             ]
     except:
         print(f"Failed: Set limit {lim_list}.")
         return None
 
 
-def _get_lim_parameter(df: DataSource, lim_list: Optional[list]):
+def _get_lim_parameter(data: DataSource, lim_list: Optional[list]):
     if lim_list is None:
         return None
     elif len(lim_list) >= 2:
@@ -51,15 +51,15 @@ def _get_lim_parameter(df: DataSource, lim_list: Optional[list]):
 _invalid_range = [None, pd.NaT, np.nan]
 
 
-@plot_action(["x"],
-             {"xlim": None})
-def set_xlim(df: DataSource, x, *arg, xlim=None, **kwargs)->AxPlot:
+@gen_action(["data", "x"],
+            {"xlim": None})
+def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs)->PlotAction:
     """
     Parameters
     ----------
     x
     """
-    lim = _get_lim_parameter(get_subset()(df, x), xlim)
+    lim = _get_lim_parameter(get_subset()(data, x), xlim)
 
     def plot(ax):
         if lim is not None:
@@ -72,15 +72,15 @@ def set_xlim(df: DataSource, x, *arg, xlim=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["y"],
-             {"ylim": None})
-def set_ylim(df: DataSource, y, *arg, ylim=None, **kwargs)->AxPlot:
+@gen_action(["data", "y"],
+            {"ylim": None})
+def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs)->PlotAction:
     """
     Parameters
     ----------
     y
     """
-    lim = _get_lim_parameter(get_subset()(df, y), ylim)
+    lim = _get_lim_parameter(get_subset()(data, y), ylim)
 
     def plot(ax):
         if lim is not None:
@@ -93,15 +93,15 @@ def set_ylim(df: DataSource, y, *arg, ylim=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["z"],
-             {"zlim": None})
-def set_zlim(df: DataSource, z, *arg, zlim=None, **kwargs)->AxPlot:
+@gen_action(["data", "z"],
+            {"zlim": None})
+def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs)->PlotAction:
     """
     Parameters
     ----------
     z
     """
-    lim = _get_lim_parameter(get_subset()(df, z), zlim)
+    lim = _get_lim_parameter(get_subset()(data, z), zlim)
 
     def plot(ax):
         if not hasattr(ax, "get_zlim"):
@@ -128,9 +128,9 @@ grid_option = {
 }
 
 
-@plot_action([],
-             default_kwargs.get("grid"))
-def set_grid(*arg, axis=None, **kwargs)->AxPlot:
+@gen_action([],
+            default_kwargs.get("grid"))
+def set_grid(*arg, axis=None, **kwargs)->PlotAction:
     """
     Show grid line.
 
@@ -162,12 +162,12 @@ tick_option = {
 }
 
 
-@plot_action(["axis"], {
+@gen_action(["axis"], {
     **tick_option,
     "locations": None,
     "labels": None
 })
-def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->AxPlot:
+def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->PlotAction:
     """
     Show/hide ticks and tick labels.
     Set tick locations and labels.
@@ -206,8 +206,8 @@ def set_tick_parameters(df, axis, *arg, locations=None, labels=None, **kwargs)->
     return plot
 
 
-@plot_action([],
-             {"xscale": None, "yscale": None, "zscale": None})
+@gen_action([],
+            {"xscale": None, "yscale": None, "zscale": None})
 def axis_scale(*arg, xscale=None, yscale=None, zscale=None):
     """
     Set axis scale types.
@@ -238,12 +238,11 @@ label_option = {
 }
 
 
-@plot_action(["xlabel", "ylabel", "zlabel"],
-             {
-                 **label_option,
+@gen_action(["xlabel", "ylabel", "zlabel"],
+            {
+    **label_option,
 })
 def set_label(
-    df: DataSource,
     xlabel: str,
     ylabel: str,
     zlabel: str,
@@ -252,7 +251,7 @@ def set_label(
     ylabelposition=None,
     zlabelposition=None,
     **kwargs
-)->AxPlot:
+)->PlotAction:
 
     def plot(ax):
         if xlabel is not None:
@@ -287,8 +286,8 @@ def set_label(
     return plot
 
 
-@plot_action(["xlabel"], {**label_option, "xlabelposition": None, })
-def set_xlabel(df, xlabel: str, *arg, xlabelposition=None, **kwargs)->AxPlot:
+@gen_action(["xlabel"], {**label_option, "xlabelposition": None, })
+def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs)->PlotAction:
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
@@ -303,8 +302,8 @@ def set_xlabel(df, xlabel: str, *arg, xlabelposition=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["ylabel"], {**label_option, "ylabelposition": None, })
-def set_ylabel(df, ylabel: str, *arg, ylabelposition=None, **kwargs)->AxPlot:
+@gen_action(["ylabel"], {**label_option, "ylabelposition": None, })
+def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs)->PlotAction:
     def plot(ax):
         if ylabel is not None:
             ax.set_ylabel(
@@ -318,8 +317,8 @@ def set_ylabel(df, ylabel: str, *arg, ylabelposition=None, **kwargs)->AxPlot:
     return plot
 
 
-@plot_action(["zlabel"], {**label_option, "zlabelposition": None, })
-def set_zlabel(df, zlabel: str, *arg, zlabelposition=None, **kwargs)->AxPlot:
+@gen_action(["zlabel"], {**label_option, "zlabelposition": None, })
+def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs)->PlotAction:
     def plot(ax):
         if zlabel is not None:
             ax.set_zlabel(

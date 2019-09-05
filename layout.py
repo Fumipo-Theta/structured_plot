@@ -5,7 +5,7 @@ from func_helper import pip
 from iter_helper import mapping, reducing
 from .subgrid import Subgrid
 from typing import List, Tuple, TypeVar, Callable, Union, Optional
-from .type_set import Ax, Figure, Number, Padding, Size, Coordinate
+from .type_set import Ax, Fig, Number, Padding, Size, Coordinate
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -541,7 +541,7 @@ class Layout:
         position = [lt[0], 1 - rb[1], rb[0] - lt[0], rb[1] - lt[1]]
         return position
 
-    def generate_axes(self, figure:Figure, padding:Padding={})->Callable[[Subgrid],Ax]:
+    def generate_axes(self, figure:Fig, padding:Padding={})->Callable[[Subgrid],Ax]:
         """
         Generate matplotlib.pyplot.axsubplot.
 
@@ -568,7 +568,7 @@ class Layout:
         padding:Padding={},
         figsize:Optional[Size]=None,
         dpi:Optional[int]=None,
-        **figure_kwargs)->Tuple[Figure,List[Ax]]:
+        **figure_kwargs)->Tuple[Fig,List[Ax]]:
         """
         Generate matplotlib.pyplot.figure and its subplots of
             matplotlib.pyplot.axsubplot.

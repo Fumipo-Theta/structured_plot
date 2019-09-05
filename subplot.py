@@ -1,21 +1,38 @@
-from func_helper import identity, pip
-import iter_helper as it
+import inspect
+from typing import Callable, Iterable, List, Optional, Tuple, TypeVar, Union
+
+import pandas as pd
+
 import dataframe_helper as dataframe
 import dict_helper as dictionary
+import iter_helper as it
 from data_loader import PathList
-from .i_subplot import ISubplot
-import pandas as pd
-from typing import List, Tuple, Callable, Union, Optional, TypeVar
+from func_helper import identity, pip
 from iter_helper import DuplicateLast as Duplicated
-from . import plot_action
 
-DataSource = Union[dict, pd.DataFrame, pd.Series, PathList]
-Ax = plot_action.Ax
-AxPlot = plot_action.AxPlot
-PlotAction = Callable[..., AxPlot]
-DataTransformer = Callable[[pd.DataFrame], pd.DataFrame]
+from . import plot_action
+from .i_subplot import ISubplot
+from .type_set import Ax, DataSource, DataTransformer, Plot, PlotAction
+
 T = TypeVar("T")
 
+def is_PlotAction(func)->bool:
+    sig = inspect.signature(func)
+    is_unary = len(sig.parameters) is 1
+    param_is_Ax = next(iter(sig.parameters.values())).annotation is Ax
+    return_is_Ax = sig.return_annotation is Ax
+    return is_unary and param_is_Ax and return_is_Ax
+
+def is_unary(func)->bool:
+    sig = inspect.signature(func)
+    return len(sig.parameters) is 1
+
+def is_binary(func)->bool:
+    sig = inspect.signature(func)
+    return len(sig.parameters) is 2
+
+def iterable(v):
+    return hasattr(v,"__iter__")
 
 def filter_dict(ref_keys):
     """
@@ -104,7 +121,7 @@ class Subplot(ISubplot):
         """
         return Subplot().add(
             data={},
-            plot=[lambda df, opt: Subplot.__noDataAx]
+            plot=lambda _, __: Subplot.__action_plot_nothing
         )
 
     def __new__(cls, *arg, **kwargs):
@@ -240,15 +257,15 @@ class Subplot(ISubplot):
                          **self.axes_style.get("title", {}))
         return ax
 
-    def plot(self, ax, test=False):
+    def plot(self, ax, test=False)->Union[Ax,Tuple[Ax,Ax]]:
         """
         pyplot.axsubplot -> pyplot.axsubplot
 
-        Apply plot action functions to ax.
+        Apply plot action functions to axes.
 
         Parameters
         ----------
-        ax: pyplot.axsubplot
+        ax: matplotlib.axes._subplot.Axes
 
         test: bool, optional
             Flag for test plot mode.
@@ -256,14 +273,14 @@ class Subplot(ISubplot):
 
         Return
         ------
-        plotted_ax: pyplot.axsubplot
-            Ax applied the plot actions.
+        plotted_ax: matplotlib.axes._subplot.Axes | Tuple[matplotlib.axes._subplot.Axes]
+            Axes applied the plot actions.
         """
 
         self.set_test_mode(test)
 
-        first_plot_actions = map(
-            self.__getPlotAction,
+        first_plot_actions:Iterable[PlotAction] = map(
+            self.__get_PlotAction,
             filter(lambda i: not self.is_second_axes[i], range(len(self)))
         )
 
@@ -276,8 +293,8 @@ class Subplot(ISubplot):
         )(ax)
 
         if any(self.is_second_axes):
-            second_axis_actions = map(
-                self.__getPlotAction,
+            second_axis_actions:Iterable[PlotAction] = map(
+                self.__get_PlotAction,
                 filter(
                     lambda i: self.is_second_axes[i], range(len(self)))
             )
@@ -298,8 +315,8 @@ class Subplot(ISubplot):
             return ax1
 
     @staticmethod
-    def Iplotter(plot_action):
-        def plotter(actions, style):
+    def Iplotter(plot_action)->Callable[[Iterable[PlotAction],dict],PlotAction]:
+        def plotter(actions: Iterable[PlotAction], style:dict)->PlotAction:
             """
             Plot actions for setting axes style
 
@@ -336,17 +353,27 @@ class Subplot(ISubplot):
             )
         return plotter
 
-    def __getPlotAction(self, i):
-        dfs: Duplicated = self.read(i)
+    def __get_PlotAction(self, i)->PlotAction:
+        df: Duplicated = self.read(i)
         opt = self.get_option(i)
 
-        if len(dfs) == 0:
-            return Subplot.__noDataAx
-        if all(map(lambda df: len(df) is 0, dfs.args)):
-            return Subplot.__noDataAx
+        if len(df) == 0:
+            return Subplot.__action_plot_nothing
+        if all(map(lambda df: len(df) is 0, df.args)):
+            return Subplot.__action_plot_nothing
+
+        def switch_by_func_type(f, data, option):
+            if is_PlotAction(f):
+                return f
+            if is_unary(f):
+                return f
+            if is_binary(f):
+                return f(data,option)
+            else:
+                raise TypeError("function for plot option must be at least unary or binary function.")
 
         return lambda ax: pip(
-            *[f(dfs, opt) for f in self.plotMethods[i]],
+            *[switch_by_func_type(_plot, df, opt) for _plot in self.plotMethods[i]],
         )(ax)
 
     def read(self, i)->Tuple[pd.DataFrame]:
@@ -412,8 +439,8 @@ class Subplot(ISubplot):
             data: Union[DataSource, Tuple[DataSource]]=None,
             dataInfo: dict={},
             index: Optional[Union[List[str], Tuple[List[str]]]]=None,
-            transformer: Union[DataTransformer, List[DataTransformer], Tuple[DataTransformer], Tuple[List[DataTransformer]]]=identity,
-            plot: List[PlotAction]=[],
+            transformer: Union[DataTransformer, Iterable[DataTransformer]]=identity,
+            plot: Union[Plot, Iterable[Plot]]=[],
             option: dict={},
             xlim: Optional[list]=None,
             ylim: Optional[list]=None,
@@ -531,7 +558,7 @@ class Subplot(ISubplot):
             )
 
         # plot
-        self.plotMethods.append(plot if type(plot) is list else [plot])
+        self.plotMethods.append(plot if iterable(plot) else [plot])
 
         # plot option
         _option = dictionary.mix(option, kwargs)
@@ -609,7 +636,7 @@ class Subplot(ISubplot):
         return new_subplot
 
     @staticmethod
-    def __noDataAx(ax):
+    def __action_plot_nothing(ax):
         ax.axis("off")
         return ax
 

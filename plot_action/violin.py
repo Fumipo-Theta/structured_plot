@@ -1,24 +1,24 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
-from .action import DataSource, AxPlot
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
 from func_helper import pip
 import iter_helper as it
 
 
-@plot_action(["y"], {**default_kwargs.get("violin")})
+@gen_action(["data","y"], {**default_kwargs.get("violin")})
 def violin(
-    df: DataSource, y, *arg,
+    data: DataSource, y, *arg,
     bodies=None,
     cmeans=None,
     widths=0.5,
     scale="width",
     **kwargs
-)->AxPlot:
+)->PlotAction:
 
     _factor = y if type(y) in [list, tuple] else [y]
 
-    _data_without_nan = [df[fname].dropna() for fname in _factor]
+    _data_without_nan = [data[fname].dropna() for fname in _factor]
     _subset_hasLegalLength = pip(
         it.filtering(lambda iv: len(iv[1]) > 0),
         list
@@ -76,17 +76,17 @@ def violin(
     return plot
 
 
-@plot_action(["x", "y"],
+@gen_action(["data","x", "y"],
              {**default_kwargs.get("violin"), "xfactor": None})
 def factor_violin(
-        df: DataSource, x, y, *arg,
+        data: DataSource, x, y, *arg,
         bodies=None,
         cmeans=None,
         widths=0.5,
         scale="width",
         xfactor=None,
         positions=None,
-        **kwargs)->AxPlot:
+        **kwargs)->PlotAction:
     """
     factor_violine
     --------------
@@ -132,12 +132,12 @@ def factor_violin(
     与えられなかったときはdf[f]でgroupbyする.
     """
 
-    _factor_series, _factor, position = Iget_factor(df, x, xfactor)
+    _factor_series, _factor, position = Iget_factor(data, x, xfactor)
     _factor_detector = pd.Categorical(
         _factor_series, ordered=True, categories=_factor)
 
-    _group = df.groupby(_factor_detector)
-    _data_without_nan = [df.loc[_group.groups[fname]][y].dropna()
+    _group = data.groupby(_factor_detector)
+    _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
                          for fname in _factor]
 
     loc_and_violin = enumerate(_data_without_nan) if positions is None \

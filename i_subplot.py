@@ -1,7 +1,7 @@
 import pandas as pd
 from abc import ABC, abstractmethod
 from data_loader import DictLoader, DataFrameLoader, TableLoader, TestLoader
-from .plot_action import DummyLoader
+from .dummy_data import DummyLoader
 
 
 class ISubplot(ABC):

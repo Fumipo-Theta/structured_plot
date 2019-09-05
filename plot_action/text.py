@@ -1,5 +1,5 @@
-from .action import plot_action,  get_subset, selector_or_literal, Icoordinate_transform
-from .action import DataSource, AxPlot
+from .action import gen_action,  get_subset, selector_or_literal, Icoordinate_transform
+from ..type_set import DataSource, PlotAction
 
 default_option = {
     "text": None,
@@ -16,9 +16,9 @@ default_option = {
 }
 
 
-@plot_action(["x", "y", "z"],
-             default_option)
-def text(df: DataSource, *arg,
+@gen_action(["data", "x", "y", "z"],
+            default_option)
+def text(data: DataSource, *arg,
          xcoordinate=None,
          ycoordinate=None,
          **kwargs):
@@ -42,8 +42,8 @@ def text(df: DataSource, *arg,
     if t is None:
         raise Exception("text parameter is required !")
 
-    positions = [get_subset()(df, selector) for selector in arg]
-    _text = get_subset()(df, t)
+    positions = [get_subset()(data, selector) for selector in arg]
+    _text = get_subset()(data, t)
 
     def plot(ax):
         zipped = zip(*positions, _text) \

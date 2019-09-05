@@ -1,5 +1,5 @@
-from .action import default_kwargs, plot_action, generate_arg_and_kwags, get_value, get_subset, get_literal_or_series
-from .action import DataSource, AxPlot, SetData, Selector, LiteralOrSequencer
+from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, get_literal_or_series
+from ..type_set import DataSource, PlotAction, ActionGenerator, Selector, LiteralOrSequencer
 
 
 contour_option = {
@@ -18,14 +18,14 @@ contour_option = {
 }
 
 
-@plot_action(["x", "y", "z"], contour_option)
+@gen_action(["data", "x", "y", "z"], contour_option)
 def contourf(
         data: DataSource,
         x: Selector,
         y: Selector,
         z: Selector,
         **kwargs
-)->AxPlot:
+)->PlotAction:
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
     _z = get_subset()(data, z)
@@ -38,14 +38,14 @@ def contourf(
     return plot
 
 
-@plot_action(["x", "y", "z"], contour_option)
+@gen_action(["data", "x", "y", "z"], contour_option)
 def contour(
         data: DataSource,
         x: Selector,
         y: Selector,
         z: Selector,
         **kwargs
-)->AxPlot:
+)->PlotAction:
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
     _z = get_subset()(data, z)

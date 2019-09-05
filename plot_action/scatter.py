@@ -1,5 +1,5 @@
-from .action import plot_action,  get_subset, get_literal_or_series
-from .action import DataSource, AxPlot, SetData, Selector, LiteralOrSequencer
+from .action import gen_action,  get_subset, get_literal_or_series
+from ..type_set import DataSource, PlotAction, ActionGenerator, Selector, LiteralOrSequencer
 
 scatter_option = {
     "c": None,
@@ -17,15 +17,15 @@ scatter_option = {
 }
 
 
-@plot_action(["x", "y", "z"],
-             {**scatter_option})
+@gen_action(["data", "x", "y", "z"],
+            {**scatter_option})
 def scatter(
     data: DataSource,
     *arg,
     c: LiteralOrSequencer=None,
     s: LiteralOrSequencer=20,
     **kwargs
-)->AxPlot:
+)->PlotAction:
     """
     scatter(x, y, [z], **kwargs)
 

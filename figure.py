@@ -201,6 +201,7 @@ class Figure:
             print(layout)
             print(self.get_subplot_names())
         # Transfer axes generating option from ISubplot to Subgrid
+
         for sg, subplot in zip(
             layout.get_subgrids(
                 order) if order is not None else layout.get_all_subgrids(),

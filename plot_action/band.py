@@ -1,5 +1,5 @@
-from .action import plot_action, get_subset, Icoordinate_transform
-from .action import DataSource, AxPlot
+from .action import gen_action, get_subset, Icoordinate_transform
+from ..type_set import DataSource, PlotAction
 import numpy as np
 import pandas as pd
 from .artist_options import line2d_option
@@ -26,9 +26,9 @@ fill_option = {
 }
 
 
-@plot_action([],
-             {**fill_option, "ypos": None})
-def hband(df, *arg, ypos=None, **kwargs)->AxPlot:
+@gen_action(["data"],
+            {**fill_option, "ypos": None})
+def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
     """
     Plot a horizontal band or line.
 
@@ -48,7 +48,7 @@ def hband(df, *arg, ypos=None, **kwargs)->AxPlot:
 
     def plot(ax):
 
-        _ypos = get_subset()(df, ypos)
+        _ypos = get_subset()(data, ypos)
 
         if not iterable(_ypos):
             _kwargs = dict(
@@ -91,9 +91,9 @@ def hband(df, *arg, ypos=None, **kwargs)->AxPlot:
 xband = hband
 
 
-@plot_action([],
-             {**fill_option, "xpos": None})
-def vband(df, *arg, xpos=None, **kwargs)->AxPlot:
+@gen_action(["data"],
+            {**fill_option, "xpos": None})
+def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
     """
     Plot a vertical band or line.
 
@@ -111,7 +111,7 @@ def vband(df, *arg, xpos=None, **kwargs)->AxPlot:
     """
     def plot(ax):
 
-        _xpos = get_subset()(df, xpos)
+        _xpos = get_subset()(data, xpos)
 
         if not iterable(_xpos):
             _kwargs = dict(

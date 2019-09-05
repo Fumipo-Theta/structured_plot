@@ -24,8 +24,7 @@ text
 """
 from matplotlib.pyplot import cm as colormap
 
-from .action import plot_action, generate_arg_and_kwags, get_subset, get_literal_or_series, selector_or_literal
-from .action import DataSource, Ax, AxPlot, PlotAction, SetData, Presetting, Scalar, Selector, LiteralOrSequence, LiteralOrSequencer
+from .action import gen_action, generate_arg_and_kwags, get_subset, get_literal_or_series, selector_or_literal
 
 from .artist_options import line2d_option
 
@@ -41,7 +40,6 @@ from .bar import bar, factor_bar, rose
 from .box import box, factor_box
 from .contour import contour, contourf
 from .cycler import *
-from .dummy_data import DummyData, DummyLoader
 from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist

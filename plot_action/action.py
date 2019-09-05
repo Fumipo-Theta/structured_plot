@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.transforms
 import functools
 from typing import Union, List, Tuple, TypeVar, Callable, NewType, Optional
@@ -9,19 +7,10 @@ from func_helper import pip
 import iter_helper as it
 from iter_helper import DuplicateLast
 from .mapping import IGetSeriesOrLiteral
-from .dummy_data import DummyData
+from ..dummy_data import DummyData
 
-DataSource = Union[dict, pd.DataFrame, pd.Series, DummyData]
-Ax = matplotlib.axes._subplots.Axes
-AxPlot = Callable[[Ax], Ax]
-PlotAction = Callable[[], AxPlot]
-SetData = Callable[[DataSource, dict], AxPlot]
-Presetting = Callable[[dict], SetData]
-Scalar = Union[int, float]
-Selector = Optional[Union[Scalar, str, Callable[[DataSource], DataSource]]]
-LiteralOrSequence = Optional[Union[int, float, str, list, tuple, DataSource]]
-LiteralOrSequencer = Optional[Union[LiteralOrSequence,
-                                    Callable[[DataSource], DataSource]]]
+from ..type_set import DataSource, PlotAction, Plotter, ActionGenerator, ActionModifier, Scalar, Selector, LiteralOrSequence, LiteralOrSequencer
+
 
 
 def iterable(i):
@@ -38,54 +27,74 @@ def notify_unsued_options(l):
     if len(l) > 0:
         print(f"Option not used: {l}")
 
-def plot_action(arg_names: List[str], default_settings: dict = {}):
+def gen_action(required_args: List[str], default_parameters: dict = {}):
     """
-    Generate plot action by hashable object and some parameters, which takes
-        matplotlib.pyplot.Axes.subplot and return it.
+    Decorator function for generating dynamic variable
+        PlotAction.
 
-    When some parameters are given as list, duplicate the other parameters
-        and make multiple plots.
+    gen_action takes two types of parameters.
+    1. List of required arg names.
+    2. Dict of default parameters.
+
+    Then decorated function must have signature of Plotter:
+
+    # Function type of decorated is Plotter
+    @gen_action(["data","x","y"], {"c":"C0","s":20})
+    def decorated(data, x, y, **default_parameters)->PlotAction:
+        def plot_action(ax: Axes)->Axes:
+            return ax
+        return plot_action
+
+    The decorated function only takes args and parameters whose name is included in the required_args or default_parameters. The other parameters are ignored.
+    In the case above, only parameters of "data", "x", "y", "c", and "s" are accepted.
+    This trick enables us to use broadcasting of parameters in generating multiple PlotAction with reducing amount of typing.
 
     Parameters
     ----------
-    plotter: *arg,**kwargs -> ax -> ax
-    default: dict
+    required_args: List[str]
+    default_parameters: dict
 
     Return
     ------
-    callable: (kwargs -> df, dict, kwargs) -> (ax -> ax)
-    """
-    arg_filter = get_values_by_keys(["data"]+arg_names, None)
-    kwarg_filter = filter_dict(default_settings.keys())
+    Function taking a Plotter and returns binary function taking prior parameters than broadcasted ones and default ones.
 
-    def wrapper(plotter: PlotAction)->Presetting:
+     two args and returning PlotAction.
+    (...any -> PlotAction) ->((DataSource, dict) -> PlotAction)
+    """
+    arg_filter = get_values_by_keys(required_args, None)
+    kwarg_filter = filter_dict(default_parameters.keys())
+
+    def wrapper(plotter: Plotter)->ActionModifier:
 
         @functools.wraps(plotter)
-        def presetting(direct_settings: dict = {}, verbose:bool=False, **direct_setting_kwargs)->SetData:
+        def action_modifier(priority_settings: dict = {}, verbose:bool=False, **priority_parameters)->ActionGenerator:
+            """
+            plot_action.line(priority_setting, **priority_parameters)
+            """
 
-            def set_data(data_source: DataSource, bloadcasted_settings: dict = {})->AxPlot:
+            def action_generator(data_source: DataSource, bloadcasted_settings: dict = {})->PlotAction:
 
                 """
                 **Priority of plot options**
 
                 Detail options override bloadcasted ones.
 
-                1. direct_setting_kwargs
-                    Dictionary passed to PlotAction
-                2. direct_settings
-                    Keyword arguments passed to PlotAction
+                1. priority_parameters
+                    Dictionary passed to Plotter
+                2. priority_settings
+                    Keyword arguments passed to Plotter
                 3. bloadcasted_settings
                     Dictionary passed from ISubplot instance
-                4. default_settings
+                4. default_parameters
                     Dictionary passed to plot_action decorator
 
                 """
                 list_of_entry = to_flatlist({
                         "data": data_source,
-                        **default_settings,
+                        **default_parameters,
                         **bloadcasted_settings,
-                        **direct_settings,
-                        **direct_setting_kwargs,
+                        **priority_settings,
+                        **priority_parameters,
                         })
 
                 valid_args = list(map(arg_filter, list_of_entry))
@@ -105,25 +114,36 @@ def plot_action(arg_names: List[str], default_settings: dict = {}):
                 return lambda ax: it.reducing(
                     lambda acc_ax, e: plotter(*e[0], **e[1])(acc_ax))(ax)(arg_and_kwarg)
 
-            set_data.__doc__ = f"""
+            action_generator.__doc__ = f"""
                 Prepere plot operation by Ax instance.
 
-                Parameters
+                Default Parameters
                 ----------
                 data_source: DataSource
 
-                {arg_names}
-                {default_settings}
+                Reruired: {required_args}
+                Default: {default_parameters}
                 """
-            return set_data
+
+            return action_generator
 
 
         # Enable refer the original docstrings
-        presetting.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
-            + "\n\nParameters" \
-            + it.reducing(lambda acc, e: f"{acc}\n{e}")("")(arg_names)\
-            + stringify_dict(default_settings)
-        return presetting
+        action_modifier.__doc__ = (plotter.__doc__ if plotter.__doc__ is not None else "") \
+            + f"""
+                Prepere plot operation by Ax instance.
+
+                Default Parameters
+                ----------
+                data_source: DataSource
+
+                Reruired: {required_args}
+                Default: {default_parameters}
+                """
+
+        action_modifier.default_parameters=default_parameters
+
+        return action_modifier
     return wrapper
 
 
@@ -579,16 +599,16 @@ default_kwargs.update({
 })
 
 
-def _annotate_plotter(df, from_pos, to_pos, text, *arg, textdict={}, **kwargs) -> AxPlot:
+def _annotate_plotter(df, from_pos, to_pos, text, *arg, textdict={}, **kwargs) -> PlotAction:
     def plot(ax):
 
         return ax
     return plot
 
 
-def annotate(**presetting):
-    return plot_action(
+def annotate(**action_modifier):
+    return gen_action(
         _annotate_plotter,
         ["from_pos", "to_pos", "text"],
         {**_quiver_kwargs, "textdict": _text_kwargs}
-    )(**presetting)
+    )(**action_modifier)
