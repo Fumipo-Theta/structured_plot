@@ -7,3 +7,5 @@ from .figure_sizing import FigureSizing
 from .save_plot import save_plot
 from .dummy_data import DummyData
 from . import type_set
+from . import plot_action
+from . import figure_size
