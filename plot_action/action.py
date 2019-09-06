@@ -27,27 +27,9 @@ def notify_unsued_options(l):
     if len(l) > 0:
         print(f"Option not used: {l}")
 
-def gen_action(required_args: List[str], default_parameters: dict = {}):
+def gen_action(required_args: List[str], default_parameters: dict = {})->Callable[[Plotter], ActionModifier]:
     """
-    Decorator function for generating dynamic variable
-        PlotAction.
-
-    gen_action takes two types of parameters.
-    1. List of required arg names.
-    2. Dict of default parameters.
-
-    Then decorated function must have signature of Plotter:
-
-    # Function type of decorated is Plotter
-    @gen_action(["data","x","y"], {"c":"C0","s":20})
-    def decorated(data, x, y, **default_parameters)->PlotAction:
-        def plot_action(ax: Axes)->Axes:
-            return ax
-        return plot_action
-
-    The decorated function only takes args and parameters whose name is included in the required_args or default_parameters. The other parameters are ignored.
-    In the case above, only parameters of "data", "x", "y", "c", and "s" are accepted.
-    This trick enables us to use broadcasting of parameters in generating multiple PlotAction with reducing amount of typing.
+    Decorater function to generate ActionModifier function from Plotter function.
 
     Parameters
     ----------
@@ -56,10 +38,59 @@ def gen_action(required_args: List[str], default_parameters: dict = {}):
 
     Return
     ------
-    Function taking a Plotter and returns binary function taking prior parameters than broadcasted ones and default ones.
+    Callable[[Plotter], ActionModifier]
+        Function taking a Plotter and returns binary function taking a dict and keyword args.
 
-     two args and returning PlotAction.
-    (...any -> PlotAction) ->((DataSource, dict) -> PlotAction)
+    Detail
+    ------
+    gen_action takes two types of parameters.
+    1. List of required args of ActionModifier.
+    2. Dict of default parameters of AcionModifier.
+
+    ActionModifier enables you to make customizable PlotAction easily, which has a signature:
+
+    ActionModifier: (provisional_parameters: dict, **prior_parameters: Any)
+                    -> (DataSource, broadcasted_parametes: dict)
+                    -> PlotAction
+
+    PlotAction has a simple signature: Axes -> Axes.
+    Then it is not flexible in reuse.
+    ActionModifier takes three types of parameters used in PlotAction.
+
+    The priority of the parameters with the same name is:
+    1. prior_parameters
+    2. broadcasted_parameters
+    3. provisional_parameters
+    4. default_parameters
+
+
+    Example
+    -------
+    The decorated function should take some parameter to use in PlotAction and
+        return function of PlotAction.
+
+    @gen_action(["data","x","y"], {"c":"C0","s":20,"alpha":1})
+    def scatter_modifier(data, x, y, **parameters)->PlotAction:
+        def plot_action(ax: Axes)->Axes:
+            # Something special to make plot
+            ax.scatter(data[x], data[y], **parameters)
+            return ax
+        return plot_action
+
+    The decorated function recieves the only args and parameters which are included
+        in the required_args or default_parameters. The other parameters are ignored.
+    In the case above, only parameters of "data", "x", "y", "c", "s", and "alpha" are accepted.
+
+    From the scatter_modifier, you can make function which generate cutomized PlotAction.
+
+    plot_half_visible_circle = scatter_modifier({"alpha":0.5})
+    plot_red_dot = scatter_modifier({"s":1}, c="red")
+
+    The first function defines PlotAction drawing partially transparent scatter plot.
+        The parameter "alpha" is set as 0.5 if it is not override by broadcasted parameters.
+    The second one defines PlotAction drawing scatter plot with red dot.
+        The parameter "s" may be override, otherwise the parameter "c" is fixed as red.
+
     """
     arg_filter = get_values_by_keys(required_args, None)
     kwarg_filter = filter_dict(default_parameters.keys())
@@ -67,33 +98,47 @@ def gen_action(required_args: List[str], default_parameters: dict = {}):
     def wrapper(plotter: Plotter)->ActionModifier:
 
         @functools.wraps(plotter)
-        def action_modifier(priority_settings: dict = {}, verbose:bool=False, **priority_parameters)->ActionGenerator:
+        def action_modifier(
+            provisional_settings: dict = {},
+            verbose:bool=False,
+            **priority_parameters
+            )->ActionGenerator:
             """
-            plot_action.line(priority_setting, **priority_parameters)
+            plot_action.line(provisional_setting, **priority_parameters)
             """
 
             def action_generator(data_source: DataSource, bloadcasted_settings: dict = {})->PlotAction:
 
                 """
-                **Priority of plot options**
+                Usage of decorated plotter
 
-                Detail options override bloadcasted ones.
+                @gen_action(required_args=[], default_parameters={})
+                def plotter(*arg, **kwargs):
+                    ...
+
+                plotter(
+                    provisional_setting={},
+                    **priority_parameters
+                )(data_source, broadcasted_settings={})
+
+
+                **Priority of plot parameters**
 
                 1. priority_parameters
-                    Dictionary passed to Plotter
-                2. priority_settings
-                    Keyword arguments passed to Plotter
-                3. bloadcasted_settings
-                    Dictionary passed from ISubplot instance
+                    Parameters passed to ActionModifier
+                2. bloadcasted_settings
+                    Dictionary passed to ActionGenerator
+                3. provisional_settings
+                    Dictionary passed to ActionModifier
                 4. default_parameters
-                    Dictionary passed to plot_action decorator
+                    Dictionary passed to gen_action decorator
 
                 """
                 list_of_entry = to_flatlist({
                         "data": data_source,
                         **default_parameters,
+                        **provisional_settings,
                         **bloadcasted_settings,
-                        **priority_settings,
                         **priority_parameters,
                         })
 
