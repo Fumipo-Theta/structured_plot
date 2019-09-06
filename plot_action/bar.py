@@ -6,8 +6,8 @@ from func_helper import pip
 import iter_helper as it
 
 
-@gen_action(["data","x", "y", "yagg"],
-             {
+@gen_action(["data", "x", "y", "yagg"],
+            {
     "norm": False,
     "width": None,
     "color": "blue",
@@ -61,11 +61,11 @@ def factor_bar(
 
     if type(y) is list:
         return bar(
-                   x=x, y=y,
-                   yagg=yagg, xfactor=xfactor,
-                   norm=norm, vert=vert,
-                   legend_labels=legend_labels, legend=legend,
-                   **kwargs)(data)
+            x=x, y=y,
+            yagg=yagg, xfactor=xfactor,
+            norm=norm, vert=vert,
+            legend_labels=legend_labels, legend=legend,
+            **kwargs)(data)
 
     """
     1. stacking bar plotのstackしていくgroupingをつくる
@@ -175,8 +175,8 @@ def factor_bar(
     return plot
 
 
-@gen_action(["data","x", "y", "yagg"],
-             {
+@gen_action(["data", "x", "y", "yagg"],
+            {
     **default_kwargs.get("bar"),
     "xfactor": None,
     "legend_labels": None,
@@ -297,7 +297,7 @@ def bar(
 
 
 @gen_action(
-    ["data","x", "y", "yagg"],
+    ["data", "x", "y", "yagg"],
     {
         **default_kwargs.get("bar"),
         "xfactor": None,
