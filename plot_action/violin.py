@@ -1,12 +1,48 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from ..kit import gen_action, get_subset, Iget_factor
 from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
 from func_helper import pip
 import iter_helper as it
 
+violin_option = {
+    "vert": True,
+    "widths": 0.5,
+    "showmeans": False,
+    "showextrema": True,
+    "showmedians": False,
+    "points": 100,
+    "bw_method": None,
+    "positions": None,
+    "scale": "width",  # "width" | "count"
 
-@gen_action(["data","y"], {**default_kwargs.get("violin")})
+    "bodies": None,
+    "cmeans": None
+}
+
+"""
+https: // matplotlib.org/api/_as_gen/matplotlib.axes.Axes.violin.html
+
+bodies: {
+    "facecolor": "#2196f3",
+    "edgecolor": "#005588",
+    "alpha": 0.5
+}
+# matplotlib.collections.PolyCollection
+https: // matplotlib.org/api/collections_api.html
+
+cmeans: {
+    "edgecolor",
+    "linestyle",
+    "linewidth",
+    "alpha"
+}
+# matplotlib.collections.LineCollection
+https: // matplotlib.org/api/collections_api.html
+"""
+
+
+@gen_action(["data", "y"], violin_option)
 def violin(
     data: DataSource, y, *arg,
     bodies=None,
@@ -76,8 +112,8 @@ def violin(
     return plot
 
 
-@gen_action(["data","x", "y"],
-             {**default_kwargs.get("violin"), "xfactor": None})
+@gen_action(["data", "x", "y"],
+            {**violin_option, "xfactor": None})
 def factor_violin(
         data: DataSource, x, y, *arg,
         bodies=None,

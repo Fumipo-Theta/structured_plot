@@ -1,4 +1,4 @@
-from .action import gen_action, get_subset, Icoordinate_transform
+from ..kit import gen_action, get_subset, Icoordinate_transform
 from ..type_set import DataSource, PlotAction
 import numpy as np
 import pandas as pd

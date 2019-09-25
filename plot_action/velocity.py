@@ -1,9 +1,20 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset
+from ..kit import gen_action, get_subset
 from ..type_set import DataSource, PlotAction
 
 
+quiver_option = {
+    "scale": 1,
+    "scale_units": "dots",
+    "alpha": 1,
+    "color": "black",
+    "width": 1,
+    "headwidth": 0.1,
+    "headlength": 0.2
+}
+
+
 @gen_action(["data", "x", "ex", "ey"],
-            {**default_kwargs.get("quiver"),
+            {**quiver_option,
              "scale": 1,
              "scale_units": "y",
              "alpha": 0.3,

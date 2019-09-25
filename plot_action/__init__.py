@@ -24,7 +24,6 @@ text
 """
 from matplotlib.pyplot import cm as colormap
 
-from .action import gen_action, generate_arg_and_kwags, get_subset, get_literal_or_series, selector_or_literal
 
 from .artist_options import line2d_option
 
@@ -39,13 +38,13 @@ from .band import hband, vband, xband, yband
 from .bar import bar, factor_bar, rose
 from .box import box, factor_box
 from .contour import contour, contourf
-from .cycler import *
+# from .cycler import *
 from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist
-from .imshow import *
+from .imshow import imshow
 from .line import line
-from .mapping import *
+# from .mapping import *
 from .multiple import multiple, m
 from .scatter import scatter
 from .text import text

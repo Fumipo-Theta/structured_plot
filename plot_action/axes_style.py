@@ -1,4 +1,4 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset
+from ..kit import gen_action, get_subset
 from ..type_set import DataSource, PlotAction
 from typing import Optional
 import numpy as np
@@ -129,7 +129,7 @@ grid_option = {
 
 
 @gen_action([],
-            default_kwargs.get("grid"))
+            grid_option)
 def set_grid(*arg, axis=None, **kwargs)->PlotAction:
     """
     Show grid line.
@@ -159,6 +159,15 @@ tick_option = {
     "left": None,
     "top": None,
     "right": None
+}
+
+tick_params_each = {
+    "labelsize": 12,
+    "rotation": 0,
+    "which": "both",
+    "direction": "in",
+    "color": "black",
+    "labelcolor": "black"
 }
 
 
@@ -200,7 +209,7 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
             ax.tick_params(axis=axis, **kwargs)
         else:
             ax.tick_params(
-                axis=axis, **dict(filter(lambda kv: kv[0] in default_kwargs.get("tick_params_each"), kwargs.items())))
+                axis=axis, **dict(filter(lambda kv: kv[0] in tick_params_each, kwargs.items())))
 
         return ax
     return plot

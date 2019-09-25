@@ -1,5 +1,6 @@
-from .action import gen_action, get_subset, get_literal_or_series
-from ..type_set import DataSource, PlotAction, Selector
+
+from ..kit import gen_action, get_subset, get_literal_or_series
+from ..type_set import DataSource, PlotAction
 from .artist_options import line2d_option
 
 

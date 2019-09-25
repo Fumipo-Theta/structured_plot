@@ -9,3 +9,4 @@ from .dummy_data import DummyData
 from . import type_set
 from . import plot_action
 from . import figure_size
+from . import kit as plot_kit

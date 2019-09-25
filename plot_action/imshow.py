@@ -1,4 +1,4 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset
+from ..kit import gen_action, get_subset
 from ..type_set import DataSource, PlotAction, Selector
 import matplotlib.image as mpimg
 

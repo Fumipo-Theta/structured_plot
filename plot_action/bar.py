@@ -1,9 +1,17 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor, get_literal_or_series
+from ..kit import gen_action, get_subset, Iget_factor, get_literal_or_series
 from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
 from func_helper import pip
 import iter_helper as it
+
+bar_option = {
+    "norm": False,
+    "width": None,
+    "color": "blue",
+    "alpha": 1,
+    "align": "center",
+}
 
 
 @gen_action(["data", "x", "y", "yagg"],
@@ -177,7 +185,7 @@ def factor_bar(
 
 @gen_action(["data", "x", "y", "yagg"],
             {
-    **default_kwargs.get("bar"),
+    **bar_option,
     "xfactor": None,
     "legend_labels": None,
     "legend": {},
@@ -299,7 +307,7 @@ def bar(
 @gen_action(
     ["data", "x", "y", "yagg"],
     {
-        **default_kwargs.get("bar"),
+        **bar_option,
         "xfactor": None,
         "cmap": None,
     }

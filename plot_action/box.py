@@ -1,11 +1,37 @@
-from .action import default_kwargs, gen_action, generate_arg_and_kwags, get_value, get_subset, Iget_factor
+from ..kit import gen_action, get_subset, Iget_factor
 from ..type_set import DataSource, PlotAction
 from typing import Union, List
 import pandas as pd
 
+box_option = {
+    "vert": True,
+    "notch": False,
+    "sym": None,  # Symbol setting for out lier
+    "whis": 1.5,
+    "bootstrap": None,
+    "usermedians": None,
+    "conf_intervals": None,
+    "widths": 0.5,
+    "patch_artist": False,
+    "manage_xticks": True,
+    "autorange": False,
+    "meanline": False,
+    "zorder": None,
+    "showcaps": True,
+    "showbox": True,
+    "showfliers": True,
+    "showmeans": False,
+    "capprops": None,
+    "boxprops": None,
+    "whiskerprops": None,
+    "flierprops": None,
+    "medianprops": None,
+    "meanprops": None
+}
+
 
 @gen_action(["y"],
-            default_kwargs.get("box"))
+            box_option)
 def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->PlotAction:
     """
     Generate box plots for indicated columns.
@@ -24,7 +50,7 @@ def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->PlotAction:
 
 
 @gen_action(["data", "x", "y"],
-            {**default_kwargs.get("box"), "xfactor": None})
+            {**box_option, "xfactor": None})
 def factor_box(data: DataSource, x, y, xfactor=None, **kwargs)->PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.

@@ -2,11 +2,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.transforms
 import functools
-from typing import Union, List, Tuple, TypeVar, Callable, NewType, Optional
+from typing import List, Tuple, Callable, NewType, Optional
 from func_helper import pip
 import iter_helper as it
 from iter_helper import DuplicateLast
-from .mapping import IGetSeriesOrLiteral
 from ..dummy_data import DummyData
 
 from ..type_set import DataSource, PlotAction, Plotter, ActionGenerator, ActionModifier, Scalar, Selector, LiteralOrSequence, LiteralOrSequencer
@@ -191,7 +190,7 @@ def gen_action(required_args: List[str], default_parameters: dict = {})->Callabl
         return action_modifier
     return wrapper
 
-
+"""
 def as_DataFrame(d: DataSource) -> pd.DataFrame:
     if type(d) in [pd.DataFrame, pd.Series]:
         return d
@@ -199,7 +198,7 @@ def as_DataFrame(d: DataSource) -> pd.DataFrame:
         return pd.DataFrame(d)
     else:
         raise TypeError(f"{type(d)} is not available for data source.")
-
+"""
 
 def generate_arg_and_kwags():
     """
@@ -278,28 +277,6 @@ def get_subset(use_index=True)\
     return f
 
 
-def get_literal_or_series(input: LiteralOrSequencer, df: DataSource)->LiteralOrSequence:
-
-    if isinstance(input, IGetSeriesOrLiteral):
-        return input.apply(df)
-    elif callable(input):
-        return input(df)
-    else:
-        return input
-
-
-def get_value(default=""):
-    def f(_, k, v):
-        """
-        Return value.
-        """
-        return v if v is not None else default
-    return f
-
-
-def is_iterable(o):
-    return type(o) in [list, tuple]
-
 
 def to_flatlist(d: dict) -> List[dict]:
     """
@@ -366,282 +343,9 @@ def get_values_by_keys(k: list, default=None)->Callable[[dict], list]:
     return lambda d: list(map(lambda key: d.get(key, default), k))
 
 
-def Iget_factor(
-    df: pd.DataFrame,
-    f: Union[str, Callable[[pd.DataFrame], pd.Series]],
-    factor: Optional[Union[list, Callable[[
-        pd.DataFrame], Tuple[pd.Series, list, list]]]]
-)->Tuple[pd.Series, list, list]:
-    d = f(df) if callable(f) else df[f]
-    if type(factor) is list:
-        return (d, factor, list(range(len(factor))))
-    elif callable(factor):
-        return factor(d)
-    else:
-        cat = d.astype('category').cat.categories
-        return (d, cat, list(range(len(cat))))
 
 
-def selector_or_literal(df, s):
-    if s is None:
-        return df.index
-    elif callable(s):
-        return s(df)
-    elif type(s) is list:
-        return s
-    elif type(s) in [int, float, str]:
-        return [s]
-    elif s in df:
-        return df[s]
-    else:
-        return df.index
 
-
-def Icoordinate_transform(ax, xcoordinate: Optional[str], ycoordinate: Optional[str]):
-    """
-    Select coordinate transform method for x and y axis.
-
-    """
-    return matplotlib.transforms.blended_transform_factory(
-        ax.transAxes if xcoordinate is "axes" else ax.transData,
-        ax.transAxes if ycoordinate is "axes" else ax.transData
-    )
-
-
-default_kwargs = {}
-
-_tick_params_each = {
-    "labelsize": 12,
-    "rotation": 0,
-    "which": "both",
-    "direction": "in",
-    "color": "black",
-    "labelcolor": "black"
-}
-
-_tick_params_kwargs = {
-    **_tick_params_each,
-    "labelsize": 12,
-    "rotation": 0,
-    "which": "both",
-    "direction": "in",
-    "color": "black",
-    "labelcolor": "black",
-    "labelbottom": None,
-    "labelleft": None,
-    "labeltop": None,
-    "labelright": None,
-    "bottom": None,
-    "left": None,
-    "top": None,
-    "right": None
-}
-
-
-_label_kwargs = {
-    "alpha": 1,
-    "color": "black",
-    "family": ["Noto Sans CJK JP", "sans-serif"],
-    # "fontname" : "sans-serif",
-    "fontsize": 16,
-    "fontstyle": "normal",
-    "fontweight": "normal",
-    "rotation": None,
-}
-
-_line2d_kwargs = {
-    "alpha": 1,
-    "marker": "",
-    "markeredgecolor": None,
-    "markeredgewidth": None,
-    "markerfacecolor": None,
-    "markerfacecoloralt": None,
-    "markersize": None,
-    "linestyle": None,
-    "linewidth": None,
-    "color": None,
-}
-
-_grid_kwargs: dict = {
-    "axis": None,
-    **_line2d_kwargs,
-    "color": 'gray',
-    "linestyle": ':',
-    "linewidth": 1,
-}
-
-_line_kwargs = {
-    **_line2d_kwargs,
-    "linestyle": "-",
-    "linewidth": 1,
-}
-
-_vhlines_kwargs = {
-    "color": None,
-    "linestyle": "-",
-    "linewidth": 1,
-    "alpha": 1
-}
-
-_scatter_kwargs = {
-    "c": None,
-    "s": None,
-    "cmap": None,
-    "norm": None,
-    "vmin": None,
-    "vmax": None,
-    "alpha": 1,
-    "marker": "o",
-    "facecolor": None,
-    "edgecolors": "face",
-    "linewidth": None,
-    "linestyle": "-"
-}
-
-_fill_kwargs = {
-    "color": "green",
-    "cmap": None,
-    "alpha": 0.5,
-    "facecolor": None,
-    "hatch": None,
-}
-
-_quiver_kwargs = {
-    "scale": 1,
-    "scale_units": "dots",
-    "alpha": 1,
-    "color": "black",
-    "width": 1,
-    "headwidth": 0.1,
-    "headlength": 0.2
-}
-
-
-_axline_kwargs = {
-    **_line2d_kwargs,
-    "alpha": 0.5,
-    "color": "green",
-    "linewidth": None,
-    "linestyle": "-"
-}
-
-_box_kwargs = {
-    "vert": True,
-    "notch": False,
-    "sym": None,  # Symbol setting for out lier
-    "whis": 1.5,
-    "bootstrap": None,
-    "usermedians": None,
-    "conf_intervals": None,
-    "widths": 0.5,
-    "patch_artist": False,
-    "manage_xticks": True,
-    "autorange": False,
-    "meanline": False,
-    "zorder": None,
-    "showcaps": True,
-    "showbox": True,
-    "showfliers": True,
-    "showmeans": False,
-    "capprops": None,
-    "boxprops": None,
-    "whiskerprops": None,
-    "flierprops": None,
-    "medianprops": None,
-    "meanprops": None
-}
-
-_violin_kwargs = {
-    "vert": True,
-    "widths": 0.5,
-    "showmeans": False,
-    "showextrema": True,
-    "showmedians": False,
-    "points": 100,
-    "bw_method": None,
-    "positions": None,
-    "scale": "width",  # "width" | "count"
-
-    "bodies": None,
-    "cmeans": None
-}
-"""
-https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.violin.html
-
-bodies:{
-    "facecolor" : "#2196f3",
-    "edgecolor" : "#005588",
-    "alpha" : 0.5
-}
-https://matplotlib.org/api/collections_api.html#matplotlib.collections.PolyCollection
-
-cmeans:{
-    "edgecolor",
-    "linestyle",
-    "linewidth",
-    "alpha"
-}
-https://matplotlib.org/api/collections_api.html#matplotlib.collections.LineCollection
-"""
-
-_text_kwargs = {
-    "ha": 'left',
-    "va": 'bottom',
-    "color": "black",
-    "family": None,
-    "fontsize": 10,
-    "rotation": None,
-    "style": None,
-    "xcoordinate": None,  # "data" = None | "axes"
-    "ycoordinate": None,  # "data" = None | "axes"
-    "wrap": False
-}
-
-_hist_kwargs = {
-    "bins": None,
-    "range": None,
-    "density": None,
-    "weights": None,
-    "cumulative": False,
-    "bottom": None,
-    "histtype": 'bar',
-    "align": 'mid',
-    "orientation": 'vertical',
-    "rwidth": None,
-    "log": False,
-    "color": "#2196f3",
-    "label": None,
-    "stacked": False,
-    "normed": None,
-}
-
-_bar_kwargs = {
-    "norm": False,
-    "width": None,
-    "color": "blue",
-    "alpha": 1,
-    "align": "center",
-}
-
-
-default_kwargs.update({
-    "tick_params_each": _tick_params_each,
-    "tick_params": _tick_params_kwargs,
-    "axis_label": _label_kwargs,
-    "grid": _grid_kwargs,
-    "line": _line_kwargs,
-    "vlines": _vhlines_kwargs,
-    "hlines": _vhlines_kwargs,
-    "scatter": _scatter_kwargs,
-    "fill": _fill_kwargs,
-    "quiver": _quiver_kwargs,
-    "axline": _axline_kwargs,
-    "box": _box_kwargs,
-    "violin": _violin_kwargs,
-    "text": _text_kwargs,
-    "hist": _hist_kwargs,
-    "bar": _bar_kwargs,
-})
 
 
 def _annotate_plotter(df, from_pos, to_pos, text, *arg, textdict={}, **kwargs) -> PlotAction:

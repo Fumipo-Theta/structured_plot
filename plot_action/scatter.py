@@ -1,4 +1,4 @@
-from .action import gen_action,  get_subset, get_literal_or_series
+from ..kit import gen_action,  get_subset, get_literal_or_series
 from ..type_set import DataSource, PlotAction, ActionGenerator, Selector, LiteralOrSequencer
 
 scatter_option = {
