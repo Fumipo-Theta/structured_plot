@@ -182,34 +182,36 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
     Set tick locations and labels.
     """
     def plot(ax):
-        if axis is "x":
-            if type(locations) in [list, np.ndarray]:
-                ax.set_xticks(locations)
-                #plt.setp(ax.get_xticklabels(), visible=True)
-            if type(labels) in [list, np.ndarray]:
-                ax.set_xticklabels(labels)
-                plt.setp(ax.get_xticklabels(), visible=True)
-        if axis is "y":
-            if type(locations) in [list, np.ndarray]:
-                ax.set_yticks(locations)
-                #plt.setp(ax.get_yticklabels(), visible=True)
-            if type(labels) in [list, np.ndarray]:
-                ax.set_yticklabels(labels)
-                plt.setp(ax.get_yticklabels(), visible=True)
+        if hasattr(ax, f"set_{axis}ticks"):
+            if axis is "x":
+                if type(locations) in [list, np.ndarray]:
+                    ax.set_xticks(locations)
 
-        if axis is "z":
-            if type(locations) in [list, np.ndarray]:
-                ax.set_zticks(locations)
-                #plt.setp(ax.get_yticklabels(), visible=True)
-            if type(labels) in [list, np.ndarray]:
-                ax.set_zticklabels(labels)
-                plt.setp(ax.get_zticklabels(), visible=True)
+                if type(labels) in [list, np.ndarray]:
+                    ax.set_xticklabels(labels)
+                    plt.setp(ax.get_xticklabels(), visible=True)
+            if axis is "y":
+                if type(locations) in [list, np.ndarray]:
+                    ax.set_yticks(locations)
+
+                if type(labels) in [list, np.ndarray]:
+                    ax.set_yticklabels(labels)
+                    plt.setp(ax.get_yticklabels(), visible=True)
+
+            if axis is "z":
+                if type(locations) in [list, np.ndarray]:
+                    ax.set_zticks(locations)
+
+                if type(labels) in [list, np.ndarray]:
+                    ax.set_zticklabels(labels)
+                    plt.setp(ax.get_zticklabels(), visible=True)
 
         if axis is "both":
             ax.tick_params(axis=axis, **kwargs)
         else:
-            ax.tick_params(
-                axis=axis, **dict(filter(lambda kv: kv[0] in tick_params_each, kwargs.items())))
+            if hasattr(ax, f"set_{axis}ticklabels"):
+                ax.tick_params(
+                    axis=axis, **dict(filter(lambda kv: kv[0] in tick_params_each, kwargs.items())))
 
         return ax
     return plot
