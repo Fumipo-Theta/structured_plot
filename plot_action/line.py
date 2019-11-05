@@ -19,7 +19,6 @@ def line(
         data: DataSource,
         *arg,
         fmt=None,
-        color=None,
         **kwargs)->PlotAction:
     f"""
     Plot line and/or marker.
@@ -36,9 +35,9 @@ def line(
     if fmt is not None:
         plot_data += [fmt]
 
-    _color = get_literal_or_series(color, data)
+    new_kwargs = {k: get_literal_or_series(v, data) for k, v in kwargs.items()}
 
     def plot(ax):
-        ax.plot(*plot_data, color=_color, **kwargs)
+        ax.plot(*plot_data,  **new_kwargs)
         return ax
     return plot
