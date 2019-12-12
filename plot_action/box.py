@@ -31,27 +31,29 @@ box_option = {
 
 
 @gen_action(["y"],
-            box_option)
-def box(df: DataSource, ys: Union[str, List[str]], *arg, **kwargs)->PlotAction:
+            {**box_option, "presenter":None})
+def box(df: DataSource, ys: Union[str, List[str]], *arg, presenter=None, **kwargs)->PlotAction:
     """
     Generate box plots for indicated columns.
     """
     _ys = ys if type(ys) is list else [ys]
 
     def plot(ax):
-        ax.boxplot(
+        res = ax.boxplot(
             [df[y].dropna() for y in _ys],
             labels=_ys,
             positions=range(0, len(_ys)),
             **kwargs
         )
+        if callable(presenter):
+            presenter(res)
         return ax
     return plot
 
 
 @gen_action(["data", "x", "y"],
-            {**box_option, "xfactor": None})
-def factor_box(data: DataSource, x, y, xfactor=None, **kwargs)->PlotAction:
+            {**box_option, "xfactor": None, "presenter":None})
+def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
 
@@ -68,12 +70,15 @@ def factor_box(data: DataSource, x, y, xfactor=None, **kwargs)->PlotAction:
         if len(_data_without_nan) is 0:
             print("No data for box plot")
             return ax
-        ax.boxplot(
+        res = ax.boxplot(
             _data_without_nan,
             labels=_factor,
             positions=position,
             **kwargs
         )
+
+        if callable(presenter):
+            presenter(res)
 
         if kwargs.get("vert", True):
             ax.set_xticks(position)
