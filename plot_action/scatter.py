@@ -12,6 +12,7 @@ scatter_option = {
     "marker": "o",
     "facecolor": None,
     "edgecolors": "face",
+    "label": None,
     "linewidth": None,
     "linestyle": "-"
 }
@@ -51,7 +52,6 @@ def scatter(
     sizes = get_literal_or_series(s, data)
 
     new_kwargs = {k: get_literal_or_series(v, data) for k, v in kwargs.items()}
-
 
     def plot(ax):
         ax.scatter(*plot_data, s=sizes, c=colors, **new_kwargs)
