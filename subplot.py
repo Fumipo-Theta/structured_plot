@@ -41,7 +41,7 @@ def filter_dict(ref_keys):
     return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
 
 
-def mix_dict(target: dict, mixing: dict, consume: bool=False)->dict:
+def mix_dict(target: dict, mixing: dict, consume: bool=False)->Tuple[dict,dict]:
     """
     Overwrite items by only the key in the old dict.
 
@@ -68,14 +68,14 @@ assert(mix_dict(
 ) == ({'xlabel': {'fontsize': 12}}, {'xlim': [0, 1], 'xlabel': {}}))
 
 
-def wrap_by_duplicate(a: Union[T, Duplicated])->Union[Duplicated]:
+def wrap_by_duplicate(a)->Duplicated:
     """
     Wrap not tuple parameter by tuple.
     """
     return a if type(a) is Duplicated else Duplicated(a)
 
 
-def get_from_duplicated(it: Duplicated, i: int, default=None):
+def get_from_duplicated(it: Duplicated[T], i: int, default=None)->T:
     """
     Take ith item in Duplicated.
     If length of Duplicated is 0, default value is used.
@@ -376,7 +376,7 @@ class Subplot(ISubplot):
             *[switch_by_func_type(_plot, df, opt) for _plot in self.plotMethods[i]],
         )(ax)
 
-    def read(self, i)->Tuple[pd.DataFrame]:
+    def read(self, i)->Duplicated[pd.DataFrame]:
         """
         Indipendent from type of data source.
         """
@@ -409,7 +409,7 @@ class Subplot(ISubplot):
                                    transformers=transformers))
         return Duplicated(*dfs)
 
-    def default_transformers(self, i)->tuple:
+    def default_transformers(self, i)->Duplicated:
         def filterX(df):
             x = self.option[i].get("x", None)
             lim = self.axes_style.get("xlim")
