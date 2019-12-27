@@ -50,7 +50,7 @@ def text(data: DataSource, *arg,
         zipped = zip(*positions, _text) \
             if hasattr(ax, "set_zlim") else zip(*positions[0:-1], _text)
 
-        artists =
+        artists = []
         for _arg in zipped:
             transform = Icoordinate_transform(ax, xcoordinate, ycoordinate)
             artists.append(ax.text(*_arg, transform=transform, **kwargs))

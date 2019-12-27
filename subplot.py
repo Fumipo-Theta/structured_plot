@@ -1,88 +1,20 @@
 import inspect
-from typing import Callable, Iterable, List, Optional, Tuple, TypeVar, Union
+from typing import Callable, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 
 import dataframe_helper as dataframe
 import dict_helper as dictionary
 import iter_helper as it
-from data_loader import PathList
 from func_helper import identity, pip
 from iter_helper import DuplicateLast as Duplicated
 
 from . import plot_action
 from .i_subplot import ISubplot
-from .type_set import Ax, DataSource, DataTransformer, Plot, PlotAction
-
-T = TypeVar("T")
-
-def is_PlotAction(func)->bool:
-    sig = inspect.signature(func)
-    is_unary = len(sig.parameters) is 1
-    param_is_Ax = next(iter(sig.parameters.values())).annotation is Ax
-    return_is_Ax = sig.return_annotation is Ax
-    return is_unary and param_is_Ax and return_is_Ax
-
-def is_unary(func)->bool:
-    sig = inspect.signature(func)
-    return len(sig.parameters) is 1
-
-def is_binary(func)->bool:
-    sig = inspect.signature(func)
-    return len(sig.parameters) is 2
-
-def iterable(v):
-    return hasattr(v,"__iter__")
-
-def filter_dict(ref_keys):
-    """
-    Filter items in a dict by reference list of keys.
-    """
-    return lambda dictionary: dict(filter(lambda kv: kv[0] in ref_keys, dictionary.items()))
-
-
-def mix_dict(target: dict, mixing: dict, consume: bool=False)->Tuple[dict,dict]:
-    """
-    Overwrite items by only the key in the old dict.
-
-    """
-    d = {}
-    for key in target.keys():
-        if type(target[key]) is dict:
-            d[key] = {
-                **target[key], **(mixing.pop(key, {}) if consume else mixing.get(key, {}))}
-        else:
-            d[key] = mixing.pop(
-                key, target[key]) if consume else mixing.get(key, target[key])
-    return d, mixing
-
-
-assert(mix_dict(
-    {
-        "xlabel": {"fontsize": 12}
-    },
-    {
-        "xlim": [0, 1],
-        "xlabel": {}
-    }
-) == ({'xlabel': {'fontsize': 12}}, {'xlim': [0, 1], 'xlabel': {}}))
-
-
-def wrap_by_duplicate(a)->Duplicated:
-    """
-    Wrap not tuple parameter by tuple.
-    """
-    return a if type(a) is Duplicated else Duplicated(a)
-
-
-def get_from_duplicated(it: Duplicated[T], i: int, default=None)->T:
-    """
-    Take ith item in Duplicated.
-    If length of Duplicated is 0, default value is used.
-    """
-    if len(it) is 0:
-        return default
-    return it[i]
+from .type_set import Ax, DataSource, DataTransformer, Plot, PlotAction, \
+    is_PlotAction, is_binary, is_unary, iterable
+from .lib.handle_duplicate import wrap_by_duplicate, get_from_duplicated
+from .lib.handle_dict import filter_dict, mix_dict
 
 
 class Subplot(ISubplot):
@@ -294,7 +226,7 @@ class Subplot(ISubplot):
             self.setXaxisFormat()
         )((ax,[]))
 
-        print(artists1)
+
 
         if any(self.is_second_axes):
             second_axis_actions:Iterable[PlotAction] = map(
@@ -314,7 +246,7 @@ class Subplot(ISubplot):
                 self.plotter(second_axis_actions, second_yaxis_style)
             )((ax1,[]))
 
-            print(artists2)
+
 
             return (ax1, ax2)
         else:
@@ -648,7 +580,7 @@ class Subplot(ISubplot):
 
     @staticmethod
     def __action_plot_nothing(ax):
-        ax.axis("off")
+        ax[0].axis("off")
         return ax
 
     def setXaxisFormat(self):
