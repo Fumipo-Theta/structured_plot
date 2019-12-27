@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset
+from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction
 
 
@@ -26,7 +26,7 @@ hist_option = {
 def hist(data: DataSource, y, *arg, **kwargs):
     _y = get_subset()(data, y)
 
+    @gen_plotter
     def plot(ax):
-        ax.hist(_y, **kwargs)
-        return ax
+        return ax.hist(_y, **kwargs)
     return plot

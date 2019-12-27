@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset, get_literal_or_series
+from ..kit import gen_action, gen_plotter, get_subset, get_literal_or_series
 from ..type_set import DataSource, PlotAction, ActionGenerator, Selector, LiteralOrSequencer
 
 default_option = {
@@ -28,14 +28,15 @@ def errorbar(
 )->PlotAction:
 
     if len(data) is 0:
-        return lambda ax: ax
+        return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
     _xerr = get_subset()(data, xerr)
     _yerr = get_subset()(data, yerr)
 
+    @gen_plotter
     def plot(ax):
-        ax.errorbar(_x, _y, xerr=_xerr, yerr=_yerr, **kwargs)
-        return ax
+        return ax.errorbar(_x, _y, xerr=_xerr, yerr=_yerr, **kwargs)
+
     return plot

@@ -1,4 +1,4 @@
-from ..kit import gen_action,  get_subset, get_literal_or_series
+from ..kit import gen_action, gen_plotter, get_subset, get_literal_or_series
 from ..type_set import DataSource, PlotAction, ActionGenerator, Selector, LiteralOrSequencer
 
 scatter_option = {
@@ -53,7 +53,8 @@ def scatter(
 
     new_kwargs = {k: get_literal_or_series(v, data) for k, v in kwargs.items()}
 
+    @gen_plotter
     def plot(ax):
-        ax.scatter(*plot_data, s=sizes, c=colors, **new_kwargs)
-        return ax
+        print(ax)
+        return ax.scatter(*plot_data, s=sizes, c=colors, **new_kwargs)
     return plot

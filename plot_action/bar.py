@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset, Iget_factor, get_literal_or_series
+from ..kit import gen_action, gen_plotter, get_subset, Iget_factor, get_literal_or_series
 from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
@@ -143,43 +143,48 @@ def factor_bar(
         # "tick_label": kwargs.get("tick_label", x_factor)
     }
 
+    @gen_plotter
     def plot(ax):
         prev_top = stack_bars[0]
+        artists = []
         for i, bar in enumerate(stack_bars):
             if vert:
                 if i is 0:
-                    ax.bar(position, bar, **plot_arg)
+                    art = ax.bar(position, bar, **plot_arg)
                 else:
-                    ax.bar(
+                    art = ax.bar(
                         position, bar, bottom=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
+                artists.append(art)
             else:
                 if i is 0:
-                    ax.barh(position, bar, **plot_arg)
+                    art = ax.barh(position, bar, **plot_arg)
                 else:
-                    ax.barh(
+                    art = ax.barh(
                         position, bar, left=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
+
+                artists.append(art)
 
         if (legend is not None) and (legend is not False):
             ax.legend(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
         if not show_factor_ticks:
-            return ax
+            return artists
 
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(x_factor)
             ax.set_xlim([-1, len(x_factor)])
-            pass
+
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(x_factor)
             ax.set_ylim([-1, len(x_factor)])
-            pass
 
-        return ax
+
+        return artists
     return plot
 
 
@@ -265,42 +270,47 @@ def bar(
         # "tick_label": kwargs.get("tick_label", x_factor)
     }
 
+    @gen_plotter
     def plot(ax):
         prev_top = stack_bars[0]
+        artists = []
+
         for i, bar in enumerate(stack_bars):
             if vert:
                 if i is 0:
-                    ax.bar(position, bar, **plot_arg)
+                    art = ax.bar(position, bar, **plot_arg)
                 else:
-                    ax.bar(
+                    art = ax.bar(
                         position, bar, bottom=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
+                artists.append(art)
             else:
                 if i is 0:
-                    ax.barh(position, bar, **plot_arg)
+                    art = ax.barh(position, bar, **plot_arg)
                 else:
-                    ax.barh(
+                    art = ax.barh(
                         position, bar, left=prev_top, **plot_arg)
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
+                artists.append(art)
 
         if (legend is not None) and (legend is not False):
             ax.legend(
                 stack_factor if legend_labels is None else legend_labels, **legend)
 
         if not show_factor_ticks:
-            return ax
+            return artists
 
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(x_factor)
             ax.set_xlim([-1, len(x_factor)])
-            pass
+
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(x_factor)
             ax.set_ylim([-1, len(x_factor)])
-            pass
-        return ax
+
+        return artists
     return plot
 
 
@@ -364,8 +374,9 @@ def rose(
         **kwargs
     }
 
+    @gen_plotter
     def plot(ax):
-        ax.bar(position, heights, **plot_arg)
 
-        return ax
+        return ax.bar(position, heights, **plot_arg)
+
     return plot

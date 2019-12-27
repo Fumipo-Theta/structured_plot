@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset
+from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction
 from typing import Optional
 import numpy as np
@@ -7,14 +7,15 @@ import matplotlib.pyplot as plt
 
 
 def set_cycler(cycler=None):
+    @gen_plotter
     def setter(ax):
         if cycler is 'default':
-            return ax
+            return None
         elif cycler is None:
-            return ax
+            return None
         else:
             ax.set_prop_cycle(cycler)
-        return ax
+        return None
     return setter
 
 
@@ -61,6 +62,7 @@ def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs)->PlotAction:
     """
     lim = _get_lim_parameter(get_subset()(data, x), xlim)
 
+    @gen_plotter
     def plot(ax):
         if lim is not None:
             now_lim = ax.get_xlim()
@@ -68,7 +70,7 @@ def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs)->PlotAction:
             next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
             next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
             ax.set_xlim(next_lim)
-        return ax
+        return None
     return plot
 
 
@@ -82,6 +84,7 @@ def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs)->PlotAction:
     """
     lim = _get_lim_parameter(get_subset()(data, y), ylim)
 
+    @gen_plotter
     def plot(ax):
         if lim is not None:
             now_lim = ax.get_ylim()
@@ -89,7 +92,7 @@ def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs)->PlotAction:
             next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
             next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
             ax.set_ylim(next_lim)
-        return ax
+        return None
     return plot
 
 
@@ -103,9 +106,10 @@ def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs)->PlotAction:
     """
     lim = _get_lim_parameter(get_subset()(data, z), zlim)
 
+    @gen_plotter
     def plot(ax):
         if not hasattr(ax, "get_zlim"):
-            return ax
+            return None
 
         if lim is not None:
             now_lim = ax.get_zlim()
@@ -113,7 +117,7 @@ def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs)->PlotAction:
             next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
             next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
             ax.set_zlim(next_lim)
-        return ax
+        return None
     return plot
 
 
@@ -136,11 +140,13 @@ def set_grid(*arg, axis=None, **kwargs)->PlotAction:
 
     axis: "x" | "y" | "z" | "both"
     """
+
+    @gen_plotter
     def plot(ax):
         if axis is None:
-            return ax
+            return None
         ax.grid(axis=axis, **kwargs)
-        return ax
+        return None
     return plot
 
 
@@ -181,6 +187,7 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
     Show/hide ticks and tick labels.
     Set tick locations and labels.
     """
+    @gen_plotter
     def plot(ax):
         if hasattr(ax, f"set_{axis}ticks"):
             if axis is "x":
@@ -213,7 +220,7 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
                 ax.tick_params(
                     axis=axis, **dict(filter(lambda kv: kv[0] in tick_params_each, kwargs.items())))
 
-        return ax
+        return None
     return plot
 
 
@@ -226,6 +233,7 @@ def axis_scale(*arg, xscale=None, yscale=None, zscale=None):
     xscale: None | "log"
     yscale: None | "log"
     """
+    @gen_plotter
     def plot(ax):
         if xscale is not None:
             ax.set_xscale(xscale)
@@ -233,7 +241,7 @@ def axis_scale(*arg, xscale=None, yscale=None, zscale=None):
             ax.set_yscale(yscale)
         if zscale is not None:
             ax.set_zscale(zscale)
-        return ax
+        return None
     return plot
 
 
@@ -264,6 +272,7 @@ def set_label(
     **kwargs
 )->PlotAction:
 
+    @gen_plotter
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
@@ -293,12 +302,14 @@ def set_label(
         if zlabelposition is not None:
             ax.zaxis.set_label_position(zlabelposition)
             plt.setp(ax.get_zticklabels(), visible=True)
-        return ax
+        return None
     return plot
 
 
 @gen_action(["xlabel"], {**label_option, "xlabelposition": None, })
 def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs)->PlotAction:
+
+    @gen_plotter
     def plot(ax):
         if xlabel is not None:
             ax.set_xlabel(
@@ -309,12 +320,14 @@ def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs)->PlotAction:
         if xlabelposition is not None:
             ax.xaxis.set_label_position(xlabelposition)
             #plt.setp(ax.get_xticklabels(), visible=True)
-        return ax
+        return None
     return plot
 
 
 @gen_action(["ylabel"], {**label_option, "ylabelposition": None, })
 def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs)->PlotAction:
+
+    @gen_plotter
     def plot(ax):
         if ylabel is not None:
             ax.set_ylabel(
@@ -324,12 +337,14 @@ def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs)->PlotAction:
         if ylabelposition is not None:
             ax.yaxis.set_label_position(ylabelposition)
             #plt.setp(ax.get_yticklabels(), visible=True)
-        return ax
+        return None
     return plot
 
 
 @gen_action(["zlabel"], {**label_option, "zlabelposition": None, })
 def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs)->PlotAction:
+
+    @gen_plotter
     def plot(ax):
         if zlabel is not None:
             ax.set_zlabel(
@@ -339,13 +354,25 @@ def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs)->PlotAction:
         if zlabelposition is not None:
             ax.zaxis.set_label_position(zlabelposition)
             #plt.setp(ax.get_yticklabels(), visible=True)
-        return ax
+        return None
     return plot
 
 
 def twinx():
     def set_data(*arg):
+        @gen_plotter
         def plot(ax):
-            return ax.twinx()
+            ax.twinx()
+            return None
+        return plot
+    return set_data
+
+
+def twiny():
+    def set_data(*arg):
+        @gen_plotter
+        def plot(ax):
+            ax.twiny()
+            return None
         return plot
     return set_data

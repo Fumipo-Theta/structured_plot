@@ -1,7 +1,7 @@
 """
 This module provides wrapper functions for plot with matplotlib.
 
-By using with other modules in "matdat" and "matpos", you can separate actions of plot
+By using with other modules in structured_plot, you can separate actions of plot
     from data and layouting.
 
 Functions
@@ -43,7 +43,7 @@ from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist
 from .imshow import imshow
-from .line import line
+from .line import line, plot
 # from .mapping import *
 from .multiple import multiple, m
 from .scatter import scatter

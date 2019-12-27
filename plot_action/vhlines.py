@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset
+from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction
 
 vhlines_option = {
@@ -13,30 +13,30 @@ vhlines_option = {
             {**vhlines_option, "lower": 0})
 def vlines(data: DataSource, x, y, *arg, lower=0, **kwargs)->PlotAction:
     if len(data) is 0:
-        return lambda ax: ax
+        return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
 
+    @gen_plotter
     def plot(ax):
-        ax.vlines(
+        return ax.vlines(
             _x, [lower for i in _x], _y, **kwargs
         )
-        return ax
     return plot
 
 
 @gen_action(["data", "x", "y"], {**vhlines_option, "lower": 0})
 def hlines(data, x, y, *arg, lower=0, **kwargs):
     if len(data) is 0:
-        return lambda ax: ax
+        return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
 
+    @gen_plotter
     def plot(ax):
-        ax.hlines(
+        return ax.hlines(
             _x, [lower for i in _x], _y, **kwargs
         )
-        return ax
     return plot

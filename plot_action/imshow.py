@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset
+from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction, Selector
 import matplotlib.image as mpimg
 
@@ -19,7 +19,7 @@ def imshow(img_like, *arg, **kwargs)->PlotAction:
     """
     img = mpimg.imread(img_like)
 
+    @gen_plotter
     def plot(ax):
-        ax.imshow(img)
-        return ax
+        return ax.imshow(img)
     return plot

@@ -251,11 +251,12 @@ class Subplot(ISubplot):
             self.diff_second_axes_style
         )[0]
 
-    def show_title(self, ax):
+    def show_title(self, t):
+        [ax,artists] = t
         if self.axes_style["title_text"] is not None:
-            ax.set_title(self.axes_style["title_text"],
+            return ax.set_title(self.axes_style["title_text"],
                          **self.axes_style.get("title", {}))
-        return ax
+        return (ax, artists)
 
     def plot(self, ax, test=False)->Union[Ax,Tuple[Ax,Ax]]:
         """
@@ -286,11 +287,14 @@ class Subplot(ISubplot):
 
         first_axis_style = self.get_first_axis_style()
 
-        ax1 = pip(
+
+        [ax1, artists1] = pip(
             self.plotter(first_plot_actions, first_axis_style),
             self.show_title,
             self.setXaxisFormat()
-        )(ax)
+        )((ax,[]))
+
+        print(artists1)
 
         if any(self.is_second_axes):
             second_axis_actions:Iterable[PlotAction] = map(
@@ -303,12 +307,14 @@ class Subplot(ISubplot):
             second_yaxis_style = {**self.get_second_axis_style()}
 
             # A hack for changing the first and the second axis limits independently.
-            ax2 = pip(
-                lambda ax: ax.twiny(),
+            [ax2, artists2] = pip(
+                lambda ax: (ax[0].twiny(), ax[1]),
                 self.plotter([], second_xaxis_style),
-                lambda ax: ax.twinx(),
+                lambda ax: (ax[0].twinx(), ax[1]),
                 self.plotter(second_axis_actions, second_yaxis_style)
-            )(ax1)
+            )((ax1,[]))
+
+            print(artists2)
 
             return (ax1, ax2)
         else:
@@ -327,9 +333,8 @@ class Subplot(ISubplot):
             * axis labels
             * axis grids
             """
-            return pip(
-                plot_action.set_cycler(style["cycler"]),
-                *actions,
+
+            style_setters = [
                 plot_action.axis_scale()({}, style["scale"]),
                 plot_action.set_xlim()({}, {"xlim": style["xlim"]}),
                 plot_action.set_ylim()({}, {"ylim": style["ylim"]}),
@@ -350,6 +355,12 @@ class Subplot(ISubplot):
                 plot_action.set_zlabel()(
                     {}, {**style["label"], **style["zlabel"]}),
                 plot_action.set_grid()({}, style["grid"])
+            ]
+
+            return pip(
+                plot_action.set_cycler(style["cycler"]),
+                *actions,
+                *style_setters
             )
         return plotter
 
@@ -641,8 +652,8 @@ class Subplot(ISubplot):
         return ax
 
     def setXaxisFormat(self):
-        def f(ax):
-            return ax
+        def f(t):
+            return t
         return f
 
     def set_test_mode(self, test):

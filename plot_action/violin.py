@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset, Iget_factor
+from ..kit import gen_action, gen_plotter, get_subset, Iget_factor
 from ..type_set import DataSource, PlotAction
 import pandas as pd
 import numpy as np
@@ -71,11 +71,12 @@ def violin(
     else:
         _widths = widths
 
+    @gen_plotter
     def plot(ax):
 
         if len(dataset) is 0:
             print("No data for violin plot")
-            return ax
+            return None
 
         parts = ax.violinplot(
             dataset=dataset,
@@ -107,7 +108,7 @@ def violin(
             ax.set_yticklabels(_factor)
             ax.set_ylim([-1, len(_factor)])
 
-        return ax
+        return parts
 
     return plot
 
@@ -195,10 +196,11 @@ def factor_violin(
     else:
         _widths = widths
 
+    @gen_plotter
     def plot(ax):
         if len(dataset) is 0:
             print("No data for violin plot")
-            return ax
+            return None
 
         parts = ax.violinplot(
             dataset=dataset,
@@ -230,5 +232,5 @@ def factor_violin(
             ax.set_yticklabels(_factor)
             #ax.set_ylim([-1, len(_factor)])
 
-        return ax
+        return parts
     return plot

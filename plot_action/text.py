@@ -1,4 +1,4 @@
-from ..kit import gen_action,  get_subset,  Icoordinate_transform
+from ..kit import gen_action, gen_plotter,  get_subset,  Icoordinate_transform
 from ..type_set import DataSource, PlotAction
 
 default_option = {
@@ -45,12 +45,14 @@ def text(data: DataSource, *arg,
     positions = [get_subset()(data, selector) for selector in arg]
     _text = get_subset()(data, t)
 
+    @gen_plotter
     def plot(ax):
         zipped = zip(*positions, _text) \
             if hasattr(ax, "set_zlim") else zip(*positions[0:-1], _text)
 
+        artists =
         for _arg in zipped:
             transform = Icoordinate_transform(ax, xcoordinate, ycoordinate)
-            ax.text(*_arg, transform=transform, **kwargs)
-        return ax
+            artists.append(ax.text(*_arg, transform=transform, **kwargs))
+        return artists
     return plot

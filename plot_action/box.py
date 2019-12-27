@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset, Iget_factor
+from ..kit import gen_action, gen_plotter, get_subset, Iget_factor
 from ..type_set import DataSource, PlotAction
 from typing import Union, List
 import pandas as pd
@@ -31,15 +31,16 @@ box_option = {
 
 
 @gen_action(["y"],
-            {**box_option, "presenter":None})
+            {**box_option, "presenter": None})
 def box(df: DataSource, ys: Union[str, List[str]], *arg, presenter=None, **kwargs)->PlotAction:
     """
     Generate box plots for indicated columns.
     """
     _ys = ys if type(ys) is list else [ys]
 
+    @gen_plotter
     def plot(ax):
-        res = ax.boxplot(
+        artist = ax.boxplot(
             [df[y].dropna() for y in _ys],
             labels=_ys,
             positions=range(0, len(_ys)),
@@ -47,12 +48,12 @@ def box(df: DataSource, ys: Union[str, List[str]], *arg, presenter=None, **kwarg
         )
         if callable(presenter):
             presenter(res)
-        return ax
+        return artist
     return plot
 
 
 @gen_action(["data", "x", "y"],
-            {**box_option, "xfactor": None, "presenter":None})
+            {**box_option, "xfactor": None, "presenter": None})
 def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
@@ -66,11 +67,12 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->
     _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
                          for fname in _factor]
 
+    @gen_plotter
     def plot(ax):
         if len(_data_without_nan) is 0:
             print("No data for box plot")
-            return ax
-        res = ax.boxplot(
+            return None
+        artist = ax.boxplot(
             _data_without_nan,
             labels=_factor,
             positions=position,
@@ -88,5 +90,5 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->
             ax.set_yticks(position)
             ax.set_yticklabels(_factor)
             #ax.set_ylim([-1, len(_factor)])
-        return ax
+        return artist
     return plot

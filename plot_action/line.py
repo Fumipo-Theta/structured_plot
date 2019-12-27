@@ -1,5 +1,5 @@
 
-from ..kit import gen_action, get_subset, get_literal_or_series
+from ..kit import gen_action, gen_plotter, get_subset, get_literal_or_series
 from ..type_set import DataSource, PlotAction
 from .artist_options import line2d_option
 
@@ -27,7 +27,7 @@ def line(
     """
 
     if len(data) is 0:
-        return lambda ax: ax
+        return gen_plotter(lambda ax: None)
 
     plot_data = [get_subset()(data, selector)
                  for selector in filter(lambda e: e is not None, arg)]
@@ -37,7 +37,10 @@ def line(
 
     new_kwargs = {k: get_literal_or_series(v, data) for k, v in kwargs.items()}
 
+    @gen_plotter
     def plot(ax):
-        ax.plot(*plot_data,  **new_kwargs)
-        return ax
+        return ax.plot(*plot_data,  **new_kwargs)
     return plot
+
+
+plot = line

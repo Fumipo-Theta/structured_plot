@@ -1,4 +1,4 @@
-from ..kit import gen_action, get_subset, Icoordinate_transform
+from ..kit import gen_action, gen_plotter, get_subset, Icoordinate_transform
 from ..type_set import DataSource, PlotAction
 import numpy as np
 import pandas as pd
@@ -13,6 +13,7 @@ axline_option = {
     **line2d_option,
     "alpha": 0.5,
     "color": "green",
+    "label": None,
     "linewidth": None,
     "linestyle": "-"
 }
@@ -23,6 +24,7 @@ fill_option = {
     "alpha": 0.5,
     "facecolor": None,
     "hatch": None,
+    "label": None
 }
 
 
@@ -46,33 +48,41 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
     ypos = "y"                line at y in data source
     """
 
+    @gen_plotter
     def plot(ax):
 
         _ypos = get_subset()(data, ypos)
+
+        artists = []
 
         if not iterable(_ypos):
             _kwargs = dict(
                 filter(lambda kv: kv[0] in axline_option, kwargs.items())
             )
-            ax.axhline(_ypos, **_kwargs)
+            artists.append(ax.axhline(_ypos, **_kwargs))
 
         else:
-            for item in _ypos:
+            for i, item in enumerate(_ypos):
                 if iterable(item):
                     if len(item) >= 2:
-                        ax.fill(
+                        art = ax.fill(
                             [0, 1, 1, 0],
                             [item[0], item[0], item[1], item[1]],
                             transform=Icoordinate_transform(
                                 ax, "axes", "data"),
                             **kwargs
                         )
+
+                        if i is 0:
+                            artists.append(art)
                     elif len(item) is 1:
                         _kwargs = dict(
                             filter(
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
-                        ax.axhline(item, **_kwargs)
+                        art = ax.axhline(item, **_kwargs)
+                        if i is 0:
+                            artists.append(art)
                     else:
                         print(
                             "ypos must be list like object with having length >= 1.")
@@ -82,9 +92,11 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
                         filter(
                             lambda kv: kv[0] in axline_option, kwargs.items())
                     )
-                    ax.axhline(item, **_kwargs)
+                    art = ax.axhline(item, **_kwargs)
+                    if i is 0:
+                        artists.append(art)
 
-        return ax
+        return artists
     return plot
 
 
@@ -109,33 +121,39 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
     xpos = zip([0,2],[1,3])   band between 0,1 and 2,3
     xpos = lambda df: df["x"] line at x in data source
     """
+    @gen_plotter
     def plot(ax):
 
         _xpos = get_subset()(data, xpos)
+        artists = []
 
         if not iterable(_xpos):
             _kwargs = dict(
                 filter(lambda kv: kv[0] in axline_option, kwargs.items())
             )
-            ax.axvline(_xpos, **_kwargs)
+            artists.append(ax.axvline(_xpos, **_kwargs))
 
         else:
-            for item in _xpos:
+            for i, item in enumerate(_xpos):
                 if iterable(item):
                     if len(item) >= 2:
-                        ax.fill(
+                        art = ax.fill(
                             [item[0], item[0], item[1], item[1]],
                             [0, 1, 1, 0],
                             transform=Icoordinate_transform(
                                 ax, "data", "axes"),
                             **kwargs
                         )
+                        if i is 0:
+                            artists.append(art)
                     elif len(item) is 1:
                         _kwargs = dict(
                             filter(
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
-                        ax.axvline(item, **_kwargs)
+                        art = ax.axvline(item, **_kwargs)
+                        if i is 0:
+                            artists.append(art)
                     else:
                         print(
                             "xpos must be list like object with having length >= 1.")
@@ -145,8 +163,10 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
                         filter(
                             lambda kv: kv[0] in axline_option, kwargs.items())
                     )
-                    ax.axvline(item, **_kwargs)
-        return ax
+                    art = ax.axvline(item, **_kwargs)
+                    if i is 0:
+                        artists.append(art)
+        return artists
     return plot
 
 
