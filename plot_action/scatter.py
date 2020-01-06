@@ -55,6 +55,5 @@ def scatter(
 
     @gen_plotter
     def plot(ax):
-        print(ax)
         return ax.scatter(*plot_data, s=sizes, c=colors, **new_kwargs)
     return plot
