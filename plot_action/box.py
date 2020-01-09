@@ -13,7 +13,7 @@ box_option = {
     "conf_intervals": None,
     "widths": 0.5,
     "patch_artist": False,
-    "manage_xticks": True,
+    "manage_ticks": True,
     "autorange": False,
     "meanline": False,
     "zorder": None,
