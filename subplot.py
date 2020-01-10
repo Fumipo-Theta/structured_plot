@@ -184,10 +184,14 @@ class Subplot(ISubplot):
         )[0]
 
     def show_title(self, t):
-        [ax,artists] = t
+        ax, artists = t
+
         if self.axes_style["title_text"] is not None:
-            return ax.set_title(self.axes_style["title_text"],
-                         **self.axes_style.get("title", {}))
+            ax.set_title(
+                self.axes_style["title_text"],
+                **self.axes_style.get("title", {})
+            )
+
         return (ax, artists)
 
     def plot(self, ax, test=False)->Union[Ax,Tuple[Ax,Ax]]:
@@ -220,7 +224,7 @@ class Subplot(ISubplot):
         first_axis_style = self.get_first_axis_style()
 
 
-        [ax1, artists1] = pip(
+        ax1, artists1 = pip(
             self.plotter(first_plot_actions, first_axis_style),
             self.show_title,
             self.setXaxisFormat()
@@ -239,7 +243,7 @@ class Subplot(ISubplot):
             second_yaxis_style = {**self.get_second_axis_style()}
 
             # A hack for changing the first and the second axis limits independently.
-            [ax2, artists2] = pip(
+            ax2, artists2 = pip(
                 lambda ax: (ax[0].twiny(), ax[1]),
                 self.plotter([], second_xaxis_style),
                 lambda ax: (ax[0].twinx(), ax[1]),
