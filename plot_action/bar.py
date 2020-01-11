@@ -270,7 +270,6 @@ def bar(
             list
         )(stack_bars)
 
-
     plot_arg = {
         **kwargs,
         # "tick_label": kwargs.get("tick_label", x_factor)
@@ -282,7 +281,7 @@ def bar(
         artists = []
 
         for i, bar in enumerate(stack_bars):
-            print(prev_top)
+            # print(prev_top)
             if vert:
                 if i is 0:
                     art = ax.bar(position, bar, **plot_arg)
