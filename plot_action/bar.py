@@ -131,8 +131,9 @@ def factor_bar(
 
         stack_bars = pip(
             it.mapping(lambda bars: pip(
-                it.mapping(lambda t: 0 if t[1] in [
-                           0, None, np.nan] else t[0]/t[1]),
+                it.mapping(lambda t: 0 if (t[1] == 0) or np.isnan(t[1])
+                           else t[0]/t[1]),
+                it.mapping(lambda v: 0 if np.isnan(v) else v),
                 list
             )(zip(bars, sum))),
             list
@@ -146,8 +147,10 @@ def factor_bar(
     @gen_plotter
     def plot(ax):
         prev_top = stack_bars[0]
+
         artists = []
         for i, bar in enumerate(stack_bars):
+            # print(prev_top)
             if vert:
                 if i is 0:
                     art = ax.bar(position, bar, **plot_arg)
@@ -182,7 +185,6 @@ def factor_bar(
             ax.set_yticks(position)
             ax.set_yticklabels(x_factor)
             ax.set_ylim([-1, len(x_factor)])
-
 
         return artists
     return plot
@@ -256,14 +258,18 @@ def bar(
             list
         )(zip(*stack_bars))
 
+        # print(sum)
+
         stack_bars = pip(
             it.mapping(lambda bars: pip(
-                it.mapping(lambda t: 0 if t[1] in [
-                           0, None, np.nan] else t[0]/t[1]),
+                it.mapping(lambda t: 0 if (t[1] == 0) or np.isnan(t[1])
+                           else t[0]/t[1]),
+                it.mapping(lambda v: 0 if np.isnan(v) else v),
                 list
             )(zip(bars, sum))),
             list
         )(stack_bars)
+
 
     plot_arg = {
         **kwargs,
@@ -276,6 +282,7 @@ def bar(
         artists = []
 
         for i, bar in enumerate(stack_bars):
+            print(prev_top)
             if vert:
                 if i is 0:
                     art = ax.bar(position, bar, **plot_arg)
