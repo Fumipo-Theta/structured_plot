@@ -345,14 +345,14 @@ class Subplot(ISubplot):
             def_trans = get_from_duplicated(default_transformers, j, [])
             trans = get_from_duplicated(data_transformers, j, [])
 
-            loader = ISubplot.IDataLoader(d, self.isTest())
+            Loader = ISubplot.IDataLoader(d, self.isTest())
 
             if self.isTest():
                 transformers = None
             else:
                 transformers = def_trans + trans
 
-            dfs.append(loader.read(d, meta=m,
+            dfs.append(Loader.read(d, meta=m,
                                    transformers=transformers))
         return Duplicated(*dfs)
 

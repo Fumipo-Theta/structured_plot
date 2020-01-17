@@ -26,17 +26,17 @@ class ISubplot(ABC):
     @staticmethod
     def IDataLoader(data_source, isTest):
         if isTest:
-            return TestLoader()
+            return TestLoader
 
         elif type(data_source) == dict:
-            return DictLoader()
+            return DictLoader
 
         elif type(data_source) in [pd.Series, pd.DataFrame]:
-            return DataFrameLoader()
+            return DataFrameLoader
 
         elif data_source is None:
-            return DummyLoader()
+            return DummyLoader
 
         else:
             # path like values of data source
-            return TableLoader()
+            return TableLoader

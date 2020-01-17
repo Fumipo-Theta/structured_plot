@@ -13,7 +13,8 @@ class DummyLoader(IDataLoader):
     def __init__(self):
         pass
 
-    def read(self, *arg, **kwargs):
+    @staticmethod
+    def read(*arg, **kwargs):
         return DummyData()
 
     def query(self, *arg, **kwargs):
