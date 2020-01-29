@@ -1,4 +1,6 @@
 # %%
+from typing import Callable, Iterable, List, Dict, Tuple, Union
+
 from func_helper import pip, identity
 from .i_subplot import ISubplot
 from .layout import Layout
@@ -6,6 +8,7 @@ from .figure_sizing import FigureSizing
 from .subgrid import Subgrid
 from .subplot import Subplot
 from functools import reduce
+from .type_set import Ax
 # %%
 
 
@@ -219,7 +222,7 @@ class Figure:
         # while len(self.subplots) < len(empty_axes):
         #    self.add_subplot(self.create_empty_subplot())
 
-        axes = pip(
+        axes: Union[Ax,Tuple[Ax,Ax]] = pip(
             Figure.__applyForEach(test),
         )(zip(
             empty_axes,
@@ -233,11 +236,11 @@ class Figure:
                 )))
 
     @staticmethod
-    def __applyForEach(test=False):
+    def __applyForEach(test=False) -> Callable[[Iterable[Tuple[Ax,ISubplot]], Iterable[Union[Ax,Tuple[Ax,Ax]]]]:
         """
         [(pyplot.axsubplot, Subplot)] -> [pyplot.axsubplot]
         """
-        def helper(t):
+        def helper(t: Tuple[Ax, ISubplot]) -> Union[Ax, Tuple[Ax,Ax]]:
             ax = t[0]
             subplot = t[1]
             return subplot.plot(ax, test)
