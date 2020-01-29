@@ -43,13 +43,8 @@ class SubplotTime(Subplot):
     def __new__(cls, *arg, **kwargs):
         return super().__new__(cls)
 
-    def __init__(self, *style_dict, xFmt=None, **style):
-        if xFmt is None:
-            raise ValueError("xFmt for datetime is required, but not set.")
-        super().__init__(*style_dict, **{
-            "xFmt": xFmt,
-            **style
-        })
+    def __init__(self, *style_dict, **style):
+        super().__init__(*style_dict, **style)
 
         self.filter_x = True
 
@@ -62,6 +57,8 @@ class SubplotTime(Subplot):
     def setXaxisFormat(self):
         def f(ax):
             xFmt = self.axes_style["style"].get("xFmt")
+            if xFmt is None:
+                raise(ValueError("Please set xFmt for indicating timestamp format."))
             ax[0].xaxis.set_major_formatter(
                 mdates.DateFormatter(xFmt)
             )
