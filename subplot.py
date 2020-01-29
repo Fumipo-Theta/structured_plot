@@ -11,7 +11,7 @@ from iter_helper import DuplicateLast as Duplicated
 
 from . import plot_action
 from .i_subplot import ISubplot
-from .type_set import Ax, DataSource, DataTransformer, Plot, PlotAction, \
+from .type_set import Ax, DataSource, DataTransformer, Plot, PlotAction, Artists,\
     is_PlotAction, is_binary, is_unary, iterable
 from .lib.handle_duplicate import wrap_by_duplicate, get_from_duplicated
 from .lib.handle_dict import filter_dict, mix_dict
@@ -194,7 +194,7 @@ class Subplot(ISubplot):
 
         return (ax, artists)
 
-    def plot(self, ax, test=False)->Union[Ax,Tuple[Ax,Ax]]:
+    def plot(self, ax: Ax, test=False)->Union[Tuple[Ax,Artists],Tuple[Tuple[Ax,Ax],Tuple[Artists,Artists]]]:
         """
         pyplot.axsubplot -> pyplot.axsubplot
 
@@ -252,9 +252,9 @@ class Subplot(ISubplot):
 
 
 
-            return (ax1, ax2)
+            return ((ax1, ax2),(artists1, artists2))
         else:
-            return ax1
+            return (ax1, artists1)
 
     @staticmethod
     def Iplotter(plot_action)->Callable[[Iterable[PlotAction],dict],PlotAction]:

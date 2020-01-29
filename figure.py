@@ -8,7 +8,7 @@ from .figure_sizing import FigureSizing
 from .subgrid import Subgrid
 from .subplot import Subplot
 from functools import reduce
-from .type_set import Ax
+from .type_set import Ax, Artists, Fig
 # %%
 
 
@@ -222,8 +222,9 @@ class Figure:
         # while len(self.subplots) < len(empty_axes):
         #    self.add_subplot(self.create_empty_subplot())
 
-        axes: Union[Ax,Tuple[Ax,Ax]] = pip(
+        axes_and_artists: List[Union[Tuple[Ax, Artists], Tuple[Tuple[Ax, Ax], Tuple[Artists, Artists]]]] = pip(
             Figure.__applyForEach(test),
+            list
         )(zip(
             empty_axes,
             self.get_subplots(
@@ -232,15 +233,15 @@ class Figure:
 
         return (fig, dict(zip(
                 order if order is not None else layout.get_subgrids_order(),
-                axes
+                [axes_artists[0] for axes_artists in axes_and_artists]
                 )))
 
     @staticmethod
-    def __applyForEach(test=False) -> Callable[[Iterable[Tuple[Ax,ISubplot]], Iterable[Union[Ax,Tuple[Ax,Ax]]]]:
+    def __applyForEach(test=False) -> Callable[[Iterable[Tuple[Ax, ISubplot]]], Iterable[Union[Tuple[Ax, Artists], Tuple[Tuple[Ax, Ax], Tuple[Artists, Artists]]]]]:
         """
         [(pyplot.axsubplot, Subplot)] -> [pyplot.axsubplot]
         """
-        def helper(t: Tuple[Ax, ISubplot]) -> Union[Ax, Tuple[Ax,Ax]]:
+        def helper(t: Tuple[Ax, ISubplot]) -> Union[Tuple[Ax, Artists], Tuple[Tuple[Ax, Ax], Tuple[Artists, Artists]]]:
             ax = t[0]
             subplot = t[1]
             return subplot.plot(ax, test)

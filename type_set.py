@@ -7,6 +7,9 @@ from .dummy_data import DummyData
 
 Ax = matplotlib.axes._subplots.Axes
 Fig = matplotlib.figure.Figure
+Artists = List[matplotlib.artist.Artist]
+
+
 Number = Union[int, float]
 Padding = Dict[str, Number]
 Size = Tuple[Number, Number]
