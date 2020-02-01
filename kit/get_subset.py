@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from typing import Callable
 from ..dummy_data import DummyData
 from ..type_set import DataSource, Selector
@@ -22,14 +23,13 @@ def get_subset(use_index=True)\
                 return df.index
             elif type(k) is str:
                 return df[k]
-            elif type(k) in [int, float]:
-                return k
             elif callable(k):
                 return k(df)
             elif iterable(k):
                 return k
             else:
-                return df[k]
+                # int, float, np.int, np.float
+                return k
 
         elif type(df) is pd.Series:
             if k in ["index", None]:
@@ -53,7 +53,7 @@ def get_subset(use_index=True)\
             elif iterable(k):
                 return k
             else:
-                return df
+                return k
 
         elif type(df) is DummyData:
             return k
