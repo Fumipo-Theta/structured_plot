@@ -321,6 +321,81 @@ def bar(
 
 
 @gen_action(
+    ["data", "x", "y", "group"],
+    {
+        **bar_option,
+        "xfactor": None,
+        "gfactor": None,
+        "cmap": None,
+        "legend_labels": None,
+        "legend": {},
+        "color": None,
+        "yerr": None,
+    }
+)
+def group_bar(
+    data: DataSource,
+    x,
+    y,
+    group,
+    *arg,
+    xfactor=None,
+    gfactor=None,
+    yerr=None,
+    legend_labels=None,
+    legend={},
+    width=0.9,
+    norm: None,
+    **kwargs
+):
+    """
+    group_bar(
+        xfactor = "year",
+        group = "area","
+        gfactor = ["Area1", "Area2", "Area3"]
+    )
+    """
+
+    x_factor_series, x_factor, positions = Iget_factor(data, x, xfactor)
+    g_factor_series, g_factor, _ = Iget_factor(data, group, gfactor)
+
+    g_group = data.groupby(
+        pd.Categorical(
+            g_factor_series,
+            ordered=True,
+            categories=g_factor
+        )
+    )
+
+    subsets = [
+        data.loc[g_group.groups[gname]]
+        for gname in g_factor
+    ]
+
+    each_width = width/len(g_factor)
+
+    def shift(i, l, w): return - w*(l-1)/2 + w*i
+
+    @gen_plotter
+    def plot(ax):
+        for i, subset in enumerate(subsets):
+            _x = [p + shift(i, len(g_factor), each_width) for p in positions]
+            _y = (get_subset()(subset, y))
+            _yerr = get_subset()(subset, yerr) if yerr is not None else None
+            ax.bar(_x, _y, width=each_width, yerr=_yerr, **kwargs)
+
+        if (legend is not None) and (legend is not False):
+            ax.legend(
+                g_factor if legend_labels is None else legend_labels, **legend)
+
+        ax.set_xticks(positions)
+        ax.set_xticklabels(x_factor)
+        ax.set_xlim([-1, len(x_factor)])
+
+    return plot
+
+
+@gen_action(
     ["data", "x", "y", "yagg"],
     {
         **bar_option,

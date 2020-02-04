@@ -35,7 +35,7 @@ from .axes_style import axis_scale
 from .axes_style import set_label, set_xlabel, set_ylabel, set_zlabel
 from .axes_style import twinx
 from .band import hband, vband, xband, yband
-from .bar import bar, factor_bar, rose
+from .bar import bar, factor_bar, group_bar, rose
 from .box import box, factor_box
 from .contour import contour, contourf
 # from .cycler import *
