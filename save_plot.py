@@ -17,12 +17,15 @@ def __mkdir(f):
 
 def __actionSavePNG(directory, filename):
     # パスが有効かどうかを検証し, ディレクトリがなければ作成する
-    return lambda postfix="": plt.savefig(directory+__safe_filename(filename+postfix+'.png'))
+    def save(postfix=""):
+        path = directory+__safe_filename(filename+postfix+'.png')
+        plt.savefig(path)
+        print(f"save as png: {path}")
+    return save
 
 
 def __IFigureSaver(ext):
     if re.match(r"[pP](ng|NG)$", ext):
-        print("save as png")
         return __actionSavePNG
 
 
