@@ -20,6 +20,7 @@ def __actionSavePNG(directory, filename):
     def save(postfix=""):
         path = directory+__safe_filename(filename+postfix+'.png')
         plt.savefig(path)
+        plt.close()
         print(f"save as png: {path}")
     return save
 

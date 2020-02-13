@@ -177,8 +177,8 @@ def factor_violin(
     _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
                          for fname in _factor]
 
-    loc_and_violin = enumerate(_data_without_nan) if positions is None \
-        else zip(positions, _data_without_nan)
+    # loc_and_violin = enumerate(_data_without_nan) if positions is None \
+    #    else zip(positions, _data_without_nan)
 
     _subset_hasLegalLength = pip(
         it.filtering(lambda iv: len(iv[1]) > 0),
