@@ -29,7 +29,7 @@ fill_option = {
 
 
 @gen_action(["data"],
-            {**fill_option, "ypos": None})
+            {**axline_option, **fill_option, "ypos": None})
 def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
     """
     Plot a horizontal band or line.
@@ -65,12 +65,17 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
             for i, item in enumerate(_ypos):
                 if iterable(item):
                     if len(item) >= 2:
+                        _kwargs = dict(
+                            filter(
+                                lambda kv: kv[0] in fill_option, kwargs.items())
+                        )
+
                         art = ax.fill(
                             [0, 1, 1, 0],
                             [item[0], item[0], item[1], item[1]],
                             transform=Icoordinate_transform(
                                 ax, "axes", "data"),
-                            **kwargs
+                            **_kwargs
                         )
 
                         if i is 0:
@@ -104,7 +109,7 @@ xband = hband
 
 
 @gen_action(["data"],
-            {**fill_option, "xpos": None})
+            {**axline_option, **fill_option, "xpos": None})
 def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
     """
     Plot a vertical band or line.
@@ -137,12 +142,17 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
             for i, item in enumerate(_xpos):
                 if iterable(item):
                     if len(item) >= 2:
+                        _kwargs = dict(
+                            filter(
+                                lambda kv: kv[0] in fill_option, kwargs.items())
+                        )
+
                         art = ax.fill(
                             [item[0], item[0], item[1], item[1]],
                             [0, 1, 1, 0],
                             transform=Icoordinate_transform(
                                 ax, "data", "axes"),
-                            **kwargs
+                            **_kwargs
                         )
                         if i is 0:
                             artists.append(art)
