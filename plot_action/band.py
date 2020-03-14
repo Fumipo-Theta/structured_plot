@@ -62,8 +62,10 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
             artists.append(ax.axhline(_ypos, **_kwargs))
 
         else:
-            for i, item in enumerate(_ypos):
+            for i, _item in enumerate(_ypos):
                 if iterable(item):
+                    item = list(filter(lambda v: v, _item))
+
                     if len(item) >= 2:
                         _kwargs = dict(
                             filter(
@@ -93,13 +95,14 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
                             "ypos must be list like object with having length >= 1.")
 
                 else:
-                    _kwargs = dict(
-                        filter(
-                            lambda kv: kv[0] in axline_option, kwargs.items())
-                    )
-                    art = ax.axhline(item, **_kwargs)
-                    if i is 0:
-                        artists.append(art)
+                    if _item is not None:
+                        _kwargs = dict(
+                            filter(
+                                lambda kv: kv[0] in axline_option, kwargs.items())
+                        )
+                        art = ax.axhline(_item, **_kwargs)
+                        if i is 0:
+                            artists.append(art)
 
         return artists
     return plot
@@ -139,8 +142,11 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
             artists.append(ax.axvline(_xpos, **_kwargs))
 
         else:
-            for i, item in enumerate(_xpos):
-                if iterable(item):
+            for i, _item in enumerate(_xpos):
+
+                if iterable(_item):
+                    item = list(filter(lambda v: v, _item))
+
                     if len(item) >= 2:
                         _kwargs = dict(
                             filter(
@@ -169,13 +175,14 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
                             "xpos must be list like object with having length >= 1.")
 
                 else:
-                    _kwargs = dict(
-                        filter(
-                            lambda kv: kv[0] in axline_option, kwargs.items())
-                    )
-                    art = ax.axvline(item, **_kwargs)
-                    if i is 0:
-                        artists.append(art)
+                    if _item is not None:
+                        _kwargs = dict(
+                            filter(
+                                lambda kv: kv[0] in axline_option, kwargs.items())
+                        )
+                        art = ax.axvline(_item, **_kwargs)
+                        if i is 0:
+                            artists.append(art)
         return artists
     return plot
 
