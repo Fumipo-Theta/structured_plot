@@ -349,11 +349,22 @@ def group_bar(
     **kwargs
 ):
     """
+    pre: Number and combination of x factors for each groups must be same.
+
     group_bar(
-        xfactor = "year",
-        group = "area","
-        gfactor = ["Area1", "Area2", "Area3"]
+        x="x",
+        y="y",
+        xfactor=["A", "B"]
+        group = "g",
+        gfactor = ["group1", "group2"]
     )
+
+    x    y     g
+    A    1     group1
+    B    1     group1
+    A    2     group2
+    B    NA    group2  <- required if y is NA
+
     """
 
     x_factor_series, x_factor, positions = Iget_factor(data, x, xfactor)
@@ -381,8 +392,15 @@ def group_bar(
         for i, subset in enumerate(subsets):
             _x = [p + shift(i, len(g_factor), each_width) for p in positions]
             _y = (get_subset()(subset, y))
+
             _yerr = get_subset()(subset, yerr) if yerr is not None else None
-            ax.bar(_x, _y, width=each_width, yerr=_yerr, **kwargs)
+
+            try:
+                ax.bar(_x, _y, width=each_width, yerr=_yerr, **kwargs)
+            except Exception as e:
+                print(_x)
+                print(_y)
+                raise e
 
         if (legend is not None) and (legend is not False):
             ax.legend(
