@@ -15,12 +15,13 @@ def __mkdir(f):
     return wrapper
 
 
-def __actionSavePNG(directory, filename):
+def __actionSavePNG(directory, filename, must_close):
     # パスが有効かどうかを検証し, ディレクトリがなければ作成する
     def save(postfix=""):
         path = directory+__safe_filename(filename+postfix+'.png')
         plt.savefig(path)
-        plt.close()
+        if must_close:
+            plt.close()
         print(f"save as png: {path}")
     return save
 
@@ -31,6 +32,6 @@ def __IFigureSaver(ext):
 
 
 @__mkdir
-def save_plot(directory, fileName, ext="png"):
+def save_plot(directory, fileName, ext="png", must_close=False):
     saver = __IFigureSaver(ext)
-    return saver(directory, fileName)
+    return saver(directory, fileName, must_close)
