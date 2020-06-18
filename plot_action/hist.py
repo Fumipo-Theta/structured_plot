@@ -3,6 +3,7 @@ from ..type_set import DataSource, PlotAction
 
 
 hist_option = {
+    "alpha": 1,
     "bins": None,
     "range": None,
     "density": None,
