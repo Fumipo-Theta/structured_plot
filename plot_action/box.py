@@ -25,36 +25,34 @@ box_option = {
     "boxprops": None,
     "whiskerprops": None,
     "flierprops": None,
-    "medianprops": None,
-    "meanprops": None
+    "medianprops": {"color": "black"},
+    "meanprops": {"marker": "o", "markerfacecolor": "black", "markeredgecolor": "black"}
 }
 
 
-@gen_action(["y"],
-            {**box_option, "presenter": None})
-def box(df: DataSource, ys: Union[str, List[str]], *arg, presenter=None, **kwargs)->PlotAction:
+@gen_action(["data", "x"],
+            {**box_option, "labels": None, "presenter": None})
+def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter=None, **kwargs) -> PlotAction:
     """
     Generate box plots for indicated columns.
     """
-    _ys = ys if type(ys) is list else [ys]
+    _xs = x if type(x) is list else [x]
 
     @gen_plotter
     def plot(ax):
         artist = ax.boxplot(
-            [df[y].dropna() for y in _ys],
-            labels=_ys,
-            positions=range(0, len(_ys)),
+            [data[x].dropna() for x in _xs],
+            labels=labels if labels else _xs,
+            positions=range(0, len(_xs)),
             **kwargs
         )
-        if callable(presenter):
-            presenter(res)
         return artist
     return plot
 
 
 @gen_action(["data", "x", "y"],
             {**box_option, "xfactor": None, "presenter": None})
-def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->PlotAction:
+def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs) -> PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
 
@@ -78,9 +76,6 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs)->
             positions=position,
             **kwargs
         )
-
-        if callable(presenter):
-            presenter(res)
 
         if kwargs.get("vert", True):
             ax.set_xticks(position)
