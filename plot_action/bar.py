@@ -27,6 +27,7 @@ bar_option = {
     "legend": {},
     "vert": True,
     "show_factor_ticks": True,
+    "map_of_xlabel": lambda label: label
 })
 def factor_bar(
     data: DataSource,
@@ -43,6 +44,7 @@ def factor_bar(
     legend_labels=None,
     legend={},
     show_factor_ticks=True,
+    map_of_xlabel=lambda x: x,
         **kwargs):
     """
     Stacking bar plot.
@@ -73,6 +75,7 @@ def factor_bar(
             yagg=yagg, xfactor=xfactor,
             norm=norm, vert=vert,
             legend_labels=legend_labels, legend=legend,
+            map_of_xlabel=map_of_xlabel,
             **kwargs)(data)
 
     """
@@ -176,15 +179,17 @@ def factor_bar(
         if not show_factor_ticks:
             return artists
 
+        xlabels = list(map(map_of_xlabel(x_factor)))
+
         if vert:
             ax.set_xticks(position)
-            ax.set_xticklabels(x_factor)
-            ax.set_xlim([-1, len(x_factor)])
+            ax.set_xticklabels(xlabels)
+            ax.set_xlim([-1, len(xlabels)])
 
         else:
             ax.set_yticks(position)
-            ax.set_yticklabels(x_factor)
-            ax.set_ylim([-1, len(x_factor)])
+            ax.set_yticklabels(xlabels)
+            ax.set_ylim([-1, len(xlabels)])
 
         return artists
     return plot
@@ -198,6 +203,7 @@ def factor_bar(
     "legend": {},
     "vert": True,
     "show_factor_ticks": True,
+    "map_of_xlabel": lambda label: label
 })
 def bar(
     data: DataSource,
@@ -212,6 +218,7 @@ def bar(
     legend_labels=None,
     legend={},
     show_factor_ticks=True,
+    map_of_xlabel=lambda x: x,
         **kwargs):
     """
     Plot bars.
@@ -306,15 +313,17 @@ def bar(
         if not show_factor_ticks:
             return artists
 
+        xlabels = list(map(map_of_xlabel, x_factor))
+
         if vert:
             ax.set_xticks(position)
-            ax.set_xticklabels(x_factor)
-            ax.set_xlim([-1, len(x_factor)])
+            ax.set_xticklabels(xlabels)
+            ax.set_xlim([-1, len(xlabels)])
 
         else:
             ax.set_yticks(position)
-            ax.set_yticklabels(x_factor)
-            ax.set_ylim([-1, len(x_factor)])
+            ax.set_yticklabels(xlabels)
+            ax.set_ylim([-1, len(xlabels)])
 
         return artists
     return plot
@@ -331,6 +340,7 @@ def bar(
         "legend": {},
         "color": None,
         "yerr": None,
+        "map_of_xlabel": lambda label: label
     }
 )
 def group_bar(
@@ -346,6 +356,7 @@ def group_bar(
     legend={},
     width=0.9,
     norm: None,
+    map_of_xlabel: lambda x: x,
     **kwargs
 ):
     """
@@ -367,7 +378,7 @@ def group_bar(
 
     """
 
-    x_factor_series, x_factor, positions = Iget_factor(data, x, xfactor)
+    _, x_factor, positions = Iget_factor(data, x, xfactor)
     g_factor_series, g_factor, _ = Iget_factor(data, group, gfactor)
 
     g_group = data.groupby(
@@ -406,9 +417,11 @@ def group_bar(
             ax.legend(
                 g_factor if legend_labels is None else legend_labels, **legend)
 
+        xlabels = list(map(map_of_xlabel, x_factor))
+
         ax.set_xticks(positions)
-        ax.set_xticklabels(x_factor)
-        ax.set_xlim([-1, len(x_factor)])
+        ax.set_xticklabels(xlabels)
+        ax.set_xlim([-1, len(xlabels)])
 
     return plot
 

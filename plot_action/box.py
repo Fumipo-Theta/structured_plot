@@ -31,17 +31,22 @@ box_option = {
 
 
 @gen_action(["data", "x"],
-            {**box_option, "labels": None, "presenter": None})
-def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter=None, **kwargs) -> PlotAction:
+            {**box_option, "labels": None, "presenter": None, "summarizer": None})
+def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter=None, summarizer=None, **kwargs) -> PlotAction:
     """
     Generate box plots for indicated columns.
     """
     _xs = x if type(x) is list else [x]
 
+    _data_without_nan = [data[x].dropna() for x in _xs]
+
+    if summarizer is not None:
+        summarizer(zip(_xs, _data_without_nan))
+
     @gen_plotter
     def plot(ax):
         artist = ax.boxplot(
-            [data[x].dropna() for x in _xs],
+            _data_without_nan,
             labels=labels if labels else _xs,
             positions=range(0, len(_xs)),
             **kwargs
@@ -51,8 +56,10 @@ def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter
 
 
 @gen_action(["data", "x", "y"],
-            {**box_option, "xfactor": None, "presenter": None})
-def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs) -> PlotAction:
+            {**box_option, "xfactor": None, "presenter": None, "summarizer": None,
+             "map_on_xlabel": lambda label: label
+             })
+def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=None, map_of_xlabel=lambda x: x, **kwargs) -> PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
 
@@ -65,6 +72,11 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs) -
     _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
                          for fname in _factor]
 
+    if summarizer is not None:
+        summarizer(zip(_factor, _data_without_nan))
+
+    labels = list(map(map_of_label, _factor))
+
     @gen_plotter
     def plot(ax):
         if len(_data_without_nan) is 0:
@@ -72,18 +84,16 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, **kwargs) -
             return None
         artist = ax.boxplot(
             _data_without_nan,
-            labels=_factor,
+            labels=labels,
             positions=position,
             **kwargs
         )
 
         if kwargs.get("vert", True):
             ax.set_xticks(position)
-            ax.set_xticklabels(_factor)
-            #ax.set_xlim([-1, len(_factor)])
+            ax.set_xticklabels(labels)
         else:
             ax.set_yticks(position)
-            ax.set_yticklabels(_factor)
-            #ax.set_ylim([-1, len(_factor)])
+            ax.set_yticklabels(labels)
         return artist
     return plot
