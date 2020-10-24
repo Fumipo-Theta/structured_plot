@@ -66,7 +66,7 @@ def factor_bar(
 
     """
 
-    if len(data) is 0:
+    if len(data) == 0:
         return lambda ax: ax
 
     if type(y) is list:
@@ -155,7 +155,7 @@ def factor_bar(
         for i, bar in enumerate(stack_bars):
             # print(prev_top)
             if vert:
-                if i is 0:
+                if i == 0:
                     art = ax.bar(position, bar, **plot_arg)
                 else:
                     art = ax.bar(
@@ -163,7 +163,7 @@ def factor_bar(
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
                 artists.append(art)
             else:
-                if i is 0:
+                if i == 0:
                     art = ax.barh(position, bar, **plot_arg)
                 else:
                     art = ax.barh(
@@ -184,12 +184,12 @@ def factor_bar(
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(xlabels)
-            ax.set_xlim([-1, len(xlabels)])
+            ax.set_xlim([-0.5, len(xlabels) - 0.5])
 
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(xlabels)
-            ax.set_ylim([-1, len(xlabels)])
+            ax.set_ylim([-0.5, len(xlabels) - 0.5])
 
         return artists
     return plot
@@ -290,7 +290,7 @@ def bar(
         for i, bar in enumerate(stack_bars):
             # print(prev_top)
             if vert:
-                if i is 0:
+                if i == 0:
                     art = ax.bar(position, bar, **plot_arg)
                 else:
                     art = ax.bar(
@@ -298,7 +298,7 @@ def bar(
                     prev_top = [a+b for a, b in zip(prev_top, bar)]
                 artists.append(art)
             else:
-                if i is 0:
+                if i == 0:
                     art = ax.barh(position, bar, **plot_arg)
                 else:
                     art = ax.barh(
@@ -318,12 +318,12 @@ def bar(
         if vert:
             ax.set_xticks(position)
             ax.set_xticklabels(xlabels)
-            ax.set_xlim([-1, len(xlabels)])
+            ax.set_xlim([-0.5, len(xlabels) - 0.5])
 
         else:
             ax.set_yticks(position)
             ax.set_yticklabels(xlabels)
-            ax.set_ylim([-1, len(xlabels)])
+            ax.set_ylim([-0.5, len(xlabels) - 0.5])
 
         return artists
     return plot

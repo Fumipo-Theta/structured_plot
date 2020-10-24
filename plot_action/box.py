@@ -57,7 +57,7 @@ def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter
 
 @gen_action(["data", "x", "y"],
             {**box_option, "xfactor": None, "presenter": None, "summarizer": None,
-             "map_on_xlabel": lambda label: label
+             "map_of_xlabel": lambda label: label
              })
 def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=None, map_of_xlabel=lambda x: x, **kwargs) -> PlotAction:
     """
@@ -75,7 +75,7 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
     if summarizer is not None:
         summarizer(zip(_factor, _data_without_nan))
 
-    labels = list(map(map_of_label, _factor))
+    labels = list(map(map_of_xlabel, _factor))
 
     @gen_plotter
     def plot(ax):
