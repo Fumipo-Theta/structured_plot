@@ -69,7 +69,7 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
         _factor_series, ordered=True, categories=_factor)
 
     _group = data.groupby(_factor_detector)
-    _data_without_nan = [data.loc[_group.groups[fname]][y].dropna()
+    _data_without_nan = [get_subset()(data.loc[_group.groups[fname]], y).dropna()
                          for fname in _factor]
 
     if summarizer is not None:
