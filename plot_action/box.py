@@ -31,8 +31,17 @@ box_option = {
 
 
 @gen_action(["data", "x"],
-            {**box_option, "labels": None, "presenter": None, "summarizer": None})
-def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter=None, summarizer=None, **kwargs) -> PlotAction:
+            {**box_option, "labels": None, "presenter": None, "summarizer": None, "map_of_position": lambda p: p, "map_of_xlabel": lambda label: label})
+def box(
+        data: DataSource,
+        x: Union[str, List[str]],
+        *arg,
+        labels=None,
+        presenter=None,
+        summarizer=None,
+        map_of_position=lambda x: x,
+        map_of_xlabel=lambda x: x,
+        **kwargs) -> PlotAction:
     """
     Generate box plots for indicated columns.
     """
@@ -43,12 +52,14 @@ def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter
     if summarizer is not None:
         summarizer(zip(_xs, _data_without_nan))
 
+    _labels = list(map(map_of_xlabel, labels if labels else _xs))
+
     @gen_plotter
     def plot(ax):
         artist = ax.boxplot(
             _data_without_nan,
-            labels=labels if labels else _xs,
-            positions=range(0, len(_xs)),
+            labels=_labels,
+            positions=list(map(map_of_position, range(0, len(_xs)))),
             **kwargs
         )
         return artist
@@ -57,9 +68,10 @@ def box(data: DataSource, x: Union[str, List[str]], *arg, labels=None, presenter
 
 @gen_action(["data", "x", "y"],
             {**box_option, "xfactor": None, "presenter": None, "summarizer": None,
+             "map_of_position": lambda p: p,
              "map_of_xlabel": lambda label: label
              })
-def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=None, map_of_xlabel=lambda x: x, **kwargs) -> PlotAction:
+def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=None, map_of_position=lambda x: x, map_of_xlabel=lambda x: x, **kwargs) -> PlotAction:
     """
     Generate box plots grouped by a factor column in DataFrame.
 
@@ -85,7 +97,7 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
         artist = ax.boxplot(
             _data_without_nan,
             labels=labels,
-            positions=position,
+            positions=list(map(map_of_position, position)),
             **kwargs
         )
 
