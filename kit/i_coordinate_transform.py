@@ -8,6 +8,6 @@ def Icoordinate_transform(ax, xcoordinate: Optional[str], ycoordinate: Optional[
 
     """
     return matplotlib.transforms.blended_transform_factory(
-        ax.transAxes if xcoordinate is "axes" else ax.transData,
-        ax.transAxes if ycoordinate is "axes" else ax.transData
+        ax.transAxes if xcoordinate == "axes" else ax.transData,
+        ax.transAxes if ycoordinate == "axes" else ax.transData
     )

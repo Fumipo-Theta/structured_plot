@@ -31,22 +31,22 @@ LiteralOrSequencer = Optional[Union[LiteralOrSequence,
                                     Callable[[DataSource], DataSource]]]
 
 
-def is_PlotAction(func)->bool:
+def is_PlotAction(func) -> bool:
     sig = inspect.signature(func)
-    is_unary = len(sig.parameters) is 1
+    is_unary = len(sig.parameters) == 1
     param_is_Ax = next(iter(sig.parameters.values())).annotation is Ax
     return_is_Ax = sig.return_annotation is Ax
     return is_unary and param_is_Ax and return_is_Ax
 
 
-def is_unary(func)->bool:
+def is_unary(func) -> bool:
     sig = inspect.signature(func)
-    return len(sig.parameters) is 1
+    return len(sig.parameters) == 1
 
 
-def is_binary(func)->bool:
+def is_binary(func) -> bool:
     sig = inspect.signature(func)
-    return len(sig.parameters) is 2
+    return len(sig.parameters) == 2
 
 
 def iterable(v):

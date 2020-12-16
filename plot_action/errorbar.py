@@ -22,12 +22,12 @@ def errorbar(
     x: Selector,
     y: Selector,
     *arg,
-    xerr: Selector=None,
-    yerr: Selector=None,
+    xerr: Selector = None,
+    yerr: Selector = None,
     **kwargs
-)->PlotAction:
+) -> PlotAction:
 
-    if len(data) is 0:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)

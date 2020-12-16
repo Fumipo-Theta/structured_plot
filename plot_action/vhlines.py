@@ -11,8 +11,8 @@ vhlines_option = {
 
 @gen_action(["data", "x", "y"],
             {**vhlines_option, "lower": 0})
-def vlines(data: DataSource, x, y, *arg, lower=0, **kwargs)->PlotAction:
-    if len(data) is 0:
+def vlines(data: DataSource, x, y, *arg, lower=0, **kwargs) -> PlotAction:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)
@@ -28,7 +28,7 @@ def vlines(data: DataSource, x, y, *arg, lower=0, **kwargs)->PlotAction:
 
 @gen_action(["data", "x", "y"], {**vhlines_option, "lower": 0})
 def hlines(data, x, y, *arg, lower=0, **kwargs):
-    if len(data) is 0:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)

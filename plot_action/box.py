@@ -91,7 +91,7 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
 
     @gen_plotter
     def plot(ax):
-        if len(_data_without_nan) is 0:
+        if len(_data_without_nan) == 0:
             print("No data for box plot")
             return None
         artist = ax.boxplot(

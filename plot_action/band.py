@@ -30,7 +30,7 @@ fill_option = {
 
 @gen_action(["data"],
             {**axline_option, **fill_option, "ypos": None})
-def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
+def hband(data, *arg, ypos=None, **kwargs) -> PlotAction:
     """
     Plot a horizontal band or line.
 
@@ -80,15 +80,15 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
                             **_kwargs
                         )
 
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
-                    elif len(item) is 1:
+                    elif len(item) == 1:
                         _kwargs = dict(
                             filter(
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
                         art = ax.axhline(item, **_kwargs)
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
                     else:
                         print(
@@ -101,7 +101,7 @@ def hband(data, *arg, ypos=None, **kwargs)->PlotAction:
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
                         art = ax.axhline(_item, **_kwargs)
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
 
         return artists
@@ -113,7 +113,7 @@ xband = hband
 
 @gen_action(["data"],
             {**axline_option, **fill_option, "xpos": None})
-def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
+def vband(data, *arg, xpos=None, **kwargs) -> PlotAction:
     """
     Plot a vertical band or line.
 
@@ -160,15 +160,15 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
                                 ax, "data", "axes"),
                             **_kwargs
                         )
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
-                    elif len(item) is 1:
+                    elif len(item) == 1:
                         _kwargs = dict(
                             filter(
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
                         art = ax.axvline(item, **_kwargs)
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
                     else:
                         print(
@@ -181,7 +181,7 @@ def vband(data, *arg, xpos=None, **kwargs)->PlotAction:
                                 lambda kv: kv[0] in axline_option, kwargs.items())
                         )
                         art = ax.axvline(_item, **_kwargs)
-                        if i is 0:
+                        if i == 0:
                             artists.append(art)
         return artists
     return plot

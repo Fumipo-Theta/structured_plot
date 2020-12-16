@@ -17,8 +17,8 @@ fill_option = {
     **fill_option,
     "color": "blue"
 })
-def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->PlotAction:
-    if len(data) is 0:
+def fill_between(data, x, y, y2=0, cmap=None, **kwargs) -> PlotAction:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)
@@ -40,8 +40,8 @@ def fill_between(data, x, y, y2=0, cmap=None, **kwargs)->PlotAction:
     **fill_option,
     "color": "blue"
 })
-def fill(data, x, y, y2=0, cmap=None, **kwargs)->PlotAction:
-    if len(data) is 0:
+def fill(data, x, y, y2=0, cmap=None, **kwargs) -> PlotAction:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     _x = get_subset()(data, x)

@@ -23,10 +23,10 @@ scatter_option = {
 def scatter(
     data: DataSource,
     *arg,
-    c: LiteralOrSequencer=None,
-    s: LiteralOrSequencer=20,
+    c: LiteralOrSequencer = None,
+    s: LiteralOrSequencer = 20,
     **kwargs
-)->PlotAction:
+) -> PlotAction:
     """
     scatter(x, y, [z], **kwargs)
 
@@ -42,7 +42,7 @@ def scatter(
         z
     """
 
-    if len(data) is 0:
+    if len(data) == 0:
         return lambda ax: ax
 
     plot_data = [get_subset()(data, selector)

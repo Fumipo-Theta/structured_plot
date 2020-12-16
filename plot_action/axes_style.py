@@ -1,3 +1,4 @@
+from .artist_options import line2d_option
 from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction
 from typing import Optional
@@ -9,7 +10,7 @@ import matplotlib.pyplot as plt
 def set_cycler(cycler=None):
     @gen_plotter
     def setter(ax):
-        if cycler is 'default':
+        if cycler == 'default':
             return None
         elif cycler is None:
             return None
@@ -43,7 +44,7 @@ def _get_lim_parameter(data: DataSource, lim_list: Optional[list]):
         return None
     elif len(lim_list) >= 2:
         return lim_list
-    elif len(lim_list) is 1:
+    elif len(lim_list) == 1:
         return [lim_list[0], None]
     else:
         return None
@@ -54,7 +55,7 @@ _invalid_range = [None, pd.NaT, np.nan]
 
 @gen_action(["data", "x"],
             {"xlim": None})
-def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs)->PlotAction:
+def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs) -> PlotAction:
     """
     Parameters
     ----------
@@ -76,7 +77,7 @@ def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs)->PlotAction:
 
 @gen_action(["data", "y"],
             {"ylim": None})
-def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs)->PlotAction:
+def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs) -> PlotAction:
     """
     Parameters
     ----------
@@ -98,7 +99,7 @@ def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs)->PlotAction:
 
 @gen_action(["data", "z"],
             {"zlim": None})
-def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs)->PlotAction:
+def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs) -> PlotAction:
     """
     Parameters
     ----------
@@ -121,8 +122,6 @@ def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs)->PlotAction:
     return plot
 
 
-from .artist_options import line2d_option
-
 grid_option = {
     **line2d_option,
     "axis": None,
@@ -134,7 +133,7 @@ grid_option = {
 
 @gen_action([],
             grid_option)
-def set_grid(*arg, axis=None, **kwargs)->PlotAction:
+def set_grid(*arg, axis=None, **kwargs) -> PlotAction:
     """
     Show grid line.
 
@@ -182,7 +181,7 @@ tick_params_each = {
     "locations": None,
     "labels": None
 })
-def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->PlotAction:
+def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs) -> PlotAction:
     """
     Show/hide ticks and tick labels.
     Set tick locations and labels.
@@ -190,14 +189,14 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
     @gen_plotter
     def plot(ax):
         if hasattr(ax, f"set_{axis}ticks"):
-            if axis is "x":
+            if axis == "x":
                 if type(locations) in [list, np.ndarray]:
                     ax.set_xticks(locations)
 
                 if type(labels) in [list, np.ndarray]:
                     ax.set_xticklabels(labels)
                     plt.setp(ax.get_xticklabels(), visible=True)
-            if axis is "y":
+            if axis == "y":
                 if type(locations) in [list, np.ndarray]:
                     ax.set_yticks(locations)
 
@@ -205,7 +204,7 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
                     ax.set_yticklabels(labels)
                     plt.setp(ax.get_yticklabels(), visible=True)
 
-            if axis is "z":
+            if axis == "z":
                 if type(locations) in [list, np.ndarray]:
                     ax.set_zticks(locations)
 
@@ -213,7 +212,7 @@ def set_tick_parameters(axis, *arg, locations=None, labels=None, **kwargs)->Plot
                     ax.set_zticklabels(labels)
                     plt.setp(ax.get_zticklabels(), visible=True)
 
-        if axis is "both":
+        if axis == "both":
             ax.tick_params(axis=axis, **kwargs)
         else:
             if hasattr(ax, f"set_{axis}ticklabels"):
@@ -270,7 +269,7 @@ def set_label(
     ylabelposition=None,
     zlabelposition=None,
     **kwargs
-)->PlotAction:
+) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
@@ -307,7 +306,7 @@ def set_label(
 
 
 @gen_action(["xlabel"], {**label_option, "xlabelposition": None, })
-def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs)->PlotAction:
+def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
@@ -325,7 +324,7 @@ def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs)->PlotAction:
 
 
 @gen_action(["ylabel"], {**label_option, "ylabelposition": None, })
-def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs)->PlotAction:
+def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
@@ -342,7 +341,7 @@ def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs)->PlotAction:
 
 
 @gen_action(["zlabel"], {**label_option, "zlabelposition": None, })
-def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs)->PlotAction:
+def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):

@@ -19,14 +19,14 @@ def line(
         data: DataSource,
         *arg,
         fmt=None,
-        **kwargs)->PlotAction:
+        **kwargs) -> PlotAction:
     f"""
     Plot line and/or marker.
 
     gen_action.line(x, y, [z], fmt=None, **kwargs)
     """
 
-    if len(data) is 0:
+    if len(data) == 0:
         return gen_plotter(lambda ax: None)
 
     plot_data = [get_subset()(data, selector)

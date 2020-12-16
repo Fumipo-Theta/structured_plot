@@ -12,20 +12,22 @@ S = TypeVar("S")
 U = TypeVar("U")
 
 
-def vectorize(f:Callable[[S],U])->Callable[[T],T]:
-    def apply(arg: T)->T:
+def vectorize(f: Callable[[S], U]) -> Callable[[T], T]:
+    def apply(arg: T) -> T:
         if type(arg) is list:
             return [f(x) for x in arg]
         elif type(arg) is tuple:
             return tuple(f(x) for x in arg)
         elif type(arg) is dict:
-            return {k:f(v) for k, v in arg.items()}
+            return {k: f(v) for k, v in arg.items()}
         else:
             return f(arg)
     return apply
 
+
 def enum_iter(l):
-    return reducing(lambda acc,e: f"{acc}\n{e}")("")(l)
+    return reducing(lambda acc, e: f"{acc}\n{e}")("")(l)
+
 
 class Layout:
     """
@@ -58,7 +60,7 @@ class Layout:
         "left": 0.5,
         "bottom": 0.5,
         "right": 0.2
-    }, unit: str="inches", dpi: str=72):
+    }, unit: str = "inches", dpi: str = 72):
         """
         Generate instance.
         With setup unit of length and dpi optionally.
@@ -82,9 +84,9 @@ class Layout:
         self.default_figure_style = {
             "facecolor": "white"
         }
-        self.unit=unit
+        self.unit = unit
         self.to_default_unit = Layout.IToDefaultUnit(unit, dpi)
-        self.default_padding=padding
+        self.default_padding = padding
         self._subgrids = {}
 
     def __len__(self):
@@ -99,7 +101,7 @@ class Layout:
     def get_subgrids_order(self):
         return self._subgrids.keys()
 
-    def get_a_subgrid(self, name=None)->Optional[Subgrid]:
+    def get_a_subgrid(self, name=None) -> Optional[Subgrid]:
         """
         Retruns subgrid with a given name.
 
@@ -113,7 +115,7 @@ class Layout:
         """
         return self._subgrids.get(name, None)
 
-    def get_subgrids(self, names)->List[Optional[Subgrid]]:
+    def get_subgrids(self, names) -> List[Optional[Subgrid]]:
         """
         Returns list of subgrids matching their name.
 
@@ -125,27 +127,27 @@ class Layout:
         ------
         List[Optional[Subgrid]]
         """
-        if len(self) is 0:
+        if len(self) == 0:
             raise Exception("There is no subgrids.")
 
         return [self._subgrids[name] for name in names]
 
-    def get_all_subgrids(self)->List[Optional[Subgrid]]:
+    def get_all_subgrids(self) -> List[Optional[Subgrid]]:
 
         return list(self._subgrids.values())
 
     @staticmethod
-    def IToDefaultUnit(unit:str, dpi:int) -> Callable[[T],T]:
-        if unit is "mm":
+    def IToDefaultUnit(unit: str, dpi: int) -> Callable[[T], T]:
+        if unit == "mm":
             return vectorize(lambda x: x/25.4 if x else x)
-        elif unit is "cm":
+        elif unit == "cm":
             return vectorize(lambda x: x/2.54 if x else x)
-        elif unit is "px":
+        elif unit == "px":
             return vectorize(lambda x: x/dpi if x else x)
         else:
             return vectorize(lambda x: x)
 
-    def get_padding(self, padding:Padding)->Padding:
+    def get_padding(self, padding: Padding) -> Padding:
         """
         Reset padding.
 
@@ -164,7 +166,7 @@ class Layout:
         """
         return {**self.default_padding, **self.to_default_unit(padding)}
 
-    def get_width(self)->Number:
+    def get_width(self) -> Number:
         """
         Width of rectangle containing all plot areas of subplots.
         Not containing axis and ticks area of subplots
@@ -172,7 +174,7 @@ class Layout:
         """
         return (self.right_bottom[0] - self.left_top[0])
 
-    def get_height(self)->Number:
+    def get_height(self) -> Number:
         """
         Hight of rectangle containing all plot areas of subplots.
         Not containing axis and ticks area of subplots
@@ -180,7 +182,7 @@ class Layout:
         """
         return (self.right_bottom[1] - self.left_top[1])
 
-    def get_size(self)->Size:
+    def get_size(self) -> Size:
         """
         Tuple of (Width, Hight) of rectangle containing
             all plot areas of subplots.
@@ -189,7 +191,7 @@ class Layout:
         """
         return (self.get_width(), self.get_height())
 
-    def __expand(self, sg_origin:Coordinate, sg_size:Size):
+    def __expand(self, sg_origin: Coordinate, sg_size: Size):
         """
         Expanding rectangle of plot areas
             if the new subplot over the rectangle.
@@ -204,7 +206,7 @@ class Layout:
             np.max([self.right_bottom[1], sg_origin[1] + sg_size[1]])
         )
 
-    def add_origin(self, new_name, size: Size, offset: Size=(0,0), **kwd):
+    def add_origin(self, new_name, size: Size, offset: Size = (0, 0), **kwd):
         sg = self
 
         _offset = self.to_default_unit(offset)
@@ -224,7 +226,7 @@ class Layout:
         self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
         return self
 
-    def from_left_top(self, origin_name, new_name, size:Size, offset:Size=(0, 0), sharex=None,sharey=None,**kwd):
+    def from_left_top(self, origin_name, new_name, size: Size, offset: Size = (0, 0), sharex=None, sharey=None, **kwd):
         """
         Layout a new subplot based on the position of
             left-top corner of the former subplot.
@@ -249,7 +251,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_left_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def from_left_bottom(self, origin_name, new_name, size: Size, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -270,7 +272,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_right_top(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def from_right_top(self, origin_name, new_name, size: Size, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -291,7 +293,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def from_right_bottom(self, origin_name, new_name, size: Size, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def from_right_bottom(self, origin_name, new_name, size: Size, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
 
@@ -312,7 +314,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_right(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def add_right(self, origin_name, new_name, size: Size, margin: Union[Number, Size] = 0, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         """
         Layout a new subplot on the right side of the
             former subplot.
@@ -360,7 +362,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_bottom(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def add_bottom(self, origin_name, new_name, size: Size, margin: Union[Number, Size] = 0, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -381,10 +383,11 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(sharex),sharey=self.get_a_subgrid(sharey),**kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+            sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_top(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def add_top(self, origin_name, new_name, size: Size, margin: Union[Number, Size] = 0, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -408,7 +411,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_left(self, origin_name, new_name, size: Size, margin: Union[Number, Size]=0, offset: Size=(0, 0), sharex=None, sharey=None, **kwd)->Subgrid:
+    def add_left(self, origin_name, new_name, size: Size, margin: Union[Number, Size] = 0, offset: Size = (0, 0), sharex=None, sharey=None, **kwd) -> Subgrid:
         _offset = self.to_default_unit(offset)
         _size = self.to_default_unit(size)
         _margin = self.to_default_unit(margin)
@@ -432,7 +435,7 @@ class Layout:
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
-    def add_grid(self, sizes:List[Size], column:int=1, margin:Union[Number,Size]=(0, 0), names=None,**kwd)->List[Subgrid]:
+    def add_grid(self, sizes: List[Size], column: int = 1, margin: Union[Number, Size] = (0, 0), names=None, **kwd) -> List[Subgrid]:
         """
         Generates subgrids aligning as grid layout.
         Order of subgrid is column prefered.
@@ -477,15 +480,15 @@ class Layout:
         d = margin if type(margin) is tuple else (margin, margin)
 
         def safe_get(l, i, default):
-            return l[i] if l is not None and len(l)>i else default
+            return l[i] if l is not None and len(l) > i else default
 
         size, *rest_sizes = sizes
-        self.add_origin(safe_get(names,0,0), size)
+        self.add_origin(safe_get(names, 0, 0), size)
 
         for i, size in enumerate(rest_sizes):
             l = len(self)
 
-            if len(self) % column is 0:
+            if len(self) % column == 0:
                 self.add_bottom(
                     safe_get(names, l-column, l-column),
                     safe_get(names, i+1, i+1),
@@ -495,12 +498,12 @@ class Layout:
                 self.add_right(
                     safe_get(names, l-1, l-1),
                     safe_get(names, i+1, i+1),
-                    size,d,**kwd
+                    size, d, **kwd
                 )
 
         return self
 
-    def __scale(self, v:Union[Coordinate,Size], padding:Padding={})->Union[Coordinate,Size]:
+    def __scale(self, v: Union[Coordinate, Size], padding: Padding = {}) -> Union[Coordinate, Size]:
         """
         Scaling position in figure by figure size.
         Padding is took into considered.
@@ -520,18 +523,17 @@ class Layout:
             np.divide(np.add(v, np.multiply(origin, -1)), size)
         )
 
-    def __relative(self, subgrid, padding:Padding={})->Tuple[Coordinate,Coordinate]:
+    def __relative(self, subgrid, padding: Padding = {}) -> Tuple[Coordinate, Coordinate]:
         """
         Return scaled position of left-top and right-bottom
             corners of a subgrid.
         """
 
-
         rel_left_top = self.__scale(subgrid.get_left_top(), padding)
         rel_right_bottom = self.__scale(subgrid.get_right_bottom(), padding)
         return (rel_left_top, rel_right_bottom)
 
-    def axes_position(self,subgrid, padding:Padding={})->List[Number]:
+    def axes_position(self, subgrid, padding: Padding = {}) -> List[Number]:
         """
         Return matplotlib style position of ax.
         """
@@ -541,7 +543,7 @@ class Layout:
         position = [lt[0], 1 - rb[1], rb[0] - lt[0], rb[1] - lt[1]]
         return position
 
-    def generate_axes(self, figure:Fig, padding:Padding={})->Callable[[Subgrid],Ax]:
+    def generate_axes(self, figure: Fig, padding: Padding = {}) -> Callable[[Subgrid], Ax]:
         """
         Generate matplotlib.pyplot.axsubplot.
 
@@ -553,7 +555,7 @@ class Layout:
         -------
         ax: matplotlib.pyplot.axsubplot
         """
-        def f(subgrid:Subgrid)->Ax:
+        def f(subgrid: Subgrid) -> Ax:
             ax = figure.add_axes(
                 self.axes_position(subgrid, padding),
                 **subgrid.get_axes_option(),
@@ -564,11 +566,11 @@ class Layout:
         return f
 
     def figure_and_axes(self,
-        subgrid_names:List[str]=None,
-        padding:Padding={},
-        figsize:Optional[Size]=None,
-        dpi:Optional[int]=None,
-        **figure_kwargs)->Tuple[Fig,List[Ax]]:
+                        subgrid_names: List[str] = None,
+                        padding: Padding = {},
+                        figsize: Optional[Size] = None,
+                        dpi: Optional[int] = None,
+                        **figure_kwargs) -> Tuple[Fig, List[Ax]]:
         """
         Generate matplotlib.pyplot.figure and its subplots of
             matplotlib.pyplot.axsubplot.
@@ -595,7 +597,8 @@ class Layout:
         fig: matplotlib.figure.Figure
         axs: list[matplotlib.axes._subplots.AxesSubplot]
         """
-        subgrids = self.get_subgrids(subgrid_names) if subgrid_names is not None else self.get_all_subgrids()
+        subgrids = self.get_subgrids(
+            subgrid_names) if subgrid_names is not None else self.get_all_subgrids()
 
         fig = plt.figure(
             figsize=self.get_size() if figsize is None else figsize,
@@ -610,7 +613,7 @@ class Layout:
         return(fig, axs)
 
     @staticmethod
-    def fontsize_to_inch(fontsize:Number, n:int, dpi:int=72)->Number:
+    def fontsize_to_inch(fontsize: Number, n: int, dpi: int = 72) -> Number:
         """
         Assist determin padding size when font size
             and number of characters are given.

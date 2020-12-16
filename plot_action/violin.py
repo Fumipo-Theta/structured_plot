@@ -50,7 +50,7 @@ def violin(
     widths=0.5,
     scale="width",
     **kwargs
-)->PlotAction:
+) -> PlotAction:
 
     _factor = y if type(y) in [list, tuple] else [y]
 
@@ -63,7 +63,7 @@ def violin(
     dataset = [iv[1].values for iv in _subset_hasLegalLength]
     positions = [iv[0] for iv in _subset_hasLegalLength]
 
-    if scale is "count":
+    if scale == "count":
         count = [len(d) for d in dataset]
         variance = [np.var(d) for d in dataset]
         max_count = np.max(count)
@@ -74,7 +74,7 @@ def violin(
     @gen_plotter
     def plot(ax):
 
-        if len(dataset) is 0:
+        if len(dataset) == 0:
             print("No data for violin plot")
             return None
 
@@ -123,7 +123,7 @@ def factor_violin(
         scale="width",
         xfactor=None,
         positions=None,
-        **kwargs)->PlotAction:
+        **kwargs) -> PlotAction:
     """
     factor_violine
     --------------
@@ -188,7 +188,7 @@ def factor_violin(
     dataset = [iv[1].values for iv in _subset_hasLegalLength]
     _positions = [position[iv[0]] for iv in _subset_hasLegalLength]
 
-    if scale is "count":
+    if scale == "count":
         count = [len(d) for d in dataset]
         variance = [np.var(d) for d in dataset]
         max_count = np.max(count)
@@ -198,7 +198,7 @@ def factor_violin(
 
     @gen_plotter
     def plot(ax):
-        if len(dataset) is 0:
+        if len(dataset) == 0:
             print("No data for violin plot")
             return None
 

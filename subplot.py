@@ -174,10 +174,10 @@ class Subplot(ISubplot):
         self.axes_style["title_text"] = title
         return self
 
-    def get_first_axis_style(self)->dict:
+    def get_first_axis_style(self) -> dict:
         return self.axes_style
 
-    def get_second_axis_style(self)->dict:
+    def get_second_axis_style(self) -> dict:
         return mix_dict(
             self.axes_style,
             self.diff_second_axes_style
@@ -194,7 +194,7 @@ class Subplot(ISubplot):
 
         return (ax, artists)
 
-    def plot(self, ax: Ax, test=False)->Union[Tuple[Ax,Artists],Tuple[Tuple[Ax,Ax],Tuple[Artists,Artists]]]:
+    def plot(self, ax: Ax, test=False) -> Union[Tuple[Ax, Artists], Tuple[Tuple[Ax, Ax], Tuple[Artists, Artists]]]:
         """
         pyplot.axsubplot -> pyplot.axsubplot
 
@@ -216,24 +216,21 @@ class Subplot(ISubplot):
 
         self.set_test_mode(test)
 
-        first_plot_actions:Iterable[PlotAction] = map(
+        first_plot_actions: Iterable[PlotAction] = map(
             self.__get_PlotAction,
             filter(lambda i: not self.is_second_axes[i], range(len(self)))
         )
 
         first_axis_style = self.get_first_axis_style()
 
-
         ax1, artists1 = pip(
             self.plotter(first_plot_actions, first_axis_style),
             self.show_title,
             self.setXaxisFormat()
-        )((ax,[]))
-
-
+        )((ax, []))
 
         if any(self.is_second_axes):
-            second_axis_actions:Iterable[PlotAction] = map(
+            second_axis_actions: Iterable[PlotAction] = map(
                 self.__get_PlotAction,
                 filter(
                     lambda i: self.is_second_axes[i], range(len(self)))
@@ -248,17 +245,15 @@ class Subplot(ISubplot):
                 self.plotter([], second_xaxis_style),
                 lambda ax: (ax[0].twinx(), ax[1]),
                 self.plotter(second_axis_actions, second_yaxis_style)
-            )((ax1,[]))
+            )((ax1, []))
 
-
-
-            return ((ax1, ax2),(artists1, artists2))
+            return ((ax1, ax2), (artists1, artists2))
         else:
             return (ax1, artists1)
 
     @staticmethod
-    def Iplotter(plot_action)->Callable[[Iterable[PlotAction],dict],PlotAction]:
-        def plotter(actions: Iterable[PlotAction], style:dict)->PlotAction:
+    def Iplotter(plot_action) -> Callable[[Iterable[PlotAction], dict], PlotAction]:
+        def plotter(actions: Iterable[PlotAction], style: dict) -> PlotAction:
             """
             Plot actions for setting axes style
 
@@ -300,13 +295,13 @@ class Subplot(ISubplot):
             )
         return plotter
 
-    def __get_PlotAction(self, i)->PlotAction:
+    def __get_PlotAction(self, i) -> PlotAction:
         df: Duplicated = self.read(i)
         opt = self.get_option(i)
 
         if len(df) == 0:
             return Subplot.__action_plot_nothing
-        if all(map(lambda df: len(df) is 0, df.args)):
+        if all(map(lambda df: len(df) == 0, df.args)):
             return Subplot.__action_plot_nothing
 
         def switch_by_func_type(f, data, option):
@@ -315,15 +310,17 @@ class Subplot(ISubplot):
             if is_unary(f):
                 return f
             if is_binary(f):
-                return f(data,option)
+                return f(data, option)
             else:
-                raise TypeError("function for plot option must be at least unary or binary function.")
+                raise TypeError(
+                    "function for plot option must be at least unary or binary function.")
 
         return lambda ax: pip(
-            *[switch_by_func_type(_plot, df, opt) for _plot in self.plotMethods[i]],
+            *[switch_by_func_type(_plot, df, opt)
+              for _plot in self.plotMethods[i]],
         )(ax)
 
-    def read(self, i)->Duplicated[pd.DataFrame]:
+    def read(self, i) -> Duplicated[pd.DataFrame]:
         """
         Indipendent from type of data source.
         """
@@ -356,13 +353,13 @@ class Subplot(ISubplot):
                                    transformers=transformers))
         return Duplicated(*dfs)
 
-    def default_transformers(self, i)->Duplicated:
+    def default_transformers(self, i) -> Duplicated:
         def filterX(df):
             x = self.option[i].get("x", None)
             lim = self.axes_style.get("xlim")
-            if len(lim) is 0 or lim is None:
+            if len(lim) == 0 or lim is None:
                 return df
-            elif len(lim) is 1:
+            elif len(lim) == 1:
                 lower = lim[0]
                 upper = None
             else:
@@ -383,29 +380,30 @@ class Subplot(ISubplot):
             return self.option[i]
 
     def add(self,
-            data: Union[DataSource, Tuple[DataSource]]=None,
-            dataInfo: dict={},
-            index: Optional[Union[List[str], Tuple[List[str]]]]=None,
-            transformer: Union[DataTransformer, Iterable[DataTransformer]]=identity,
-            plot: Union[Plot, Iterable[Plot]]=[],
-            option: dict={},
-            xlim: Optional[list]=None,
-            ylim: Optional[list]=None,
-            zlim: Optional[list]=None,
-            xscale: Optional[str]=None,
-            yscale: Optional[str]=None,
-            zscale: Optional[str]=None,
-            tick: dict={},
-            xtick: dict={},
-            ytick: dict={},
-            ztick: dict={},
-            xlabel: Optional[str]=None,
-            ylabel: Optional[str]=None,
-            zlabel: Optional[str]=None,
-            title: Optional[str]= None,
+            data: Union[DataSource, Tuple[DataSource]] = None,
+            dataInfo: dict = {},
+            index: Optional[Union[List[str], Tuple[List[str]]]] = None,
+            transformer: Union[DataTransformer,
+                               Iterable[DataTransformer]] = identity,
+            plot: Union[Plot, Iterable[Plot]] = [],
+            option: dict = {},
+            xlim: Optional[list] = None,
+            ylim: Optional[list] = None,
+            zlim: Optional[list] = None,
+            xscale: Optional[str] = None,
+            yscale: Optional[str] = None,
+            zscale: Optional[str] = None,
+            tick: dict = {},
+            xtick: dict = {},
+            ytick: dict = {},
+            ztick: dict = {},
+            xlabel: Optional[str] = None,
+            ylabel: Optional[str] = None,
+            zlabel: Optional[str] = None,
+            title: Optional[str] = None,
             cycler=None,
-            within_xlim: bool=False,
-            second_axis: bool=False,
+            within_xlim: bool = False,
+            second_axis: bool = False,
             **_kwargs):
         """
         Set parameters for plotting.
