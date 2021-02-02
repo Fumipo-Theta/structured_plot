@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+matplotlib = "*"
+numpy = "*"
+dict-helper = {git = "https://github.com/Fumipo-Theta/dict_helper"}
+func-helper = {git = "https://github.com/Fumipo-Theta/func_helper"}
+iter-helper = {git = "https://github.com/Fumipo-Theta/iter_helper"}
+structured-plot = {editable = true, path = "."}
+
+[dev-packages]
+
+[requires]
+python_version = "3"
