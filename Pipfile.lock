@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0fdd9c1967dc68d90dda9998f7c8d36e8d493682e5448b1ff602d6a2dad709ab"
+            "sha256": "0273f2d29fe0da29c3c95ed710b81352a38d97a2f261d953b61631842d31ed0c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,6 +22,14 @@
                 "sha256:cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"
             ],
             "version": "==0.10.0"
+        },
+        "data-loader": {
+            "git": "https://github.com/Fumipo-Theta/data_loader",
+            "ref": "ddcb0b876065e663c454e70646a992b769b853a5"
+        },
+        "dataframe-helper": {
+            "git": "https://github.com/Fumipo-Theta/dataframe_helper",
+            "ref": "ac265f806da4df30d5c861e332f45184e3f5116f"
         },
         "dict-helper": {
             "git": "https://github.com/Fumipo-Theta/dict_helper",
