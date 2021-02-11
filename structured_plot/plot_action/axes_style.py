@@ -1,7 +1,9 @@
+from __future__ import annotations
+import re
 from .artist_options import line2d_option
 from ..kit import gen_action, gen_plotter, get_subset
 from ..type_set import DataSource, PlotAction
-from typing import Optional
+from typing import Callable, Optional
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,34 +22,40 @@ def set_cycler(cycler=None):
     return setter
 
 
-def _get_lim(data: DataSource, lim_list: Optional[list]):
+def _lim_parser(orig_new: tuple[float, str | float | int | Callable[[float], float] | None]) -> float:
+    orig, new = orig_new
+    if new is None:
+        return orig
+    if callable(new):
+        return new(orig)
+
     try:
-        if lim_list is not None and len(lim_list) >= 2:
-            lim = [*lim_list]
-            if lim[0] is None:
-                lim[0] = np.min(data.min())
-            if lim[1] is None:
-                lim[1] = np.max(data.max())
-            return lim
+        return float(new)
+    except Exception as _e:
+        if (match := re.search(r"([-+])([0-9\.]+)%", new)) is not None:
+            d_sign = 1 if match[1] == "+" else -1
+            d_ratio = float(match[2]) / 100
+            d = d_sign * abs(orig) * d_ratio
+            return orig + d
         else:
-            return [
-                np.min(data.min()),
-                np.max(data.max())
-            ]
-    except:
-        print(f"Failed: Set limit {lim_list}.")
-        return None
+            raise ValueError("Invalid range format.")
 
 
-def _get_lim_parameter(data: DataSource, lim_list: Optional[list]):
+def _get_lim_parameter(original_lim, lim_list: list[str | float | int | Callable[[float], float] | None] | None) -> list[float]:
+    """
+    lim_list
+        If autoscaled limit is [-5, 90],
+        [0, None] => [0, 90.0]
+        [None, 100.0] => [-5, 100.0]
+        ["-10%", "+10%"] => [-5.5, 99.0]
+
+    """
     if lim_list is None:
-        return None
+        return original_lim
     elif len(lim_list) >= 2:
-        return lim_list
-    elif len(lim_list) == 1:
-        return [lim_list[0], None]
+        return list(map(_lim_parser, zip(original_lim, lim_list[0:2])))
     else:
-        return None
+        return original_lim
 
 
 _invalid_range = [None, pd.NaT, np.nan]
@@ -61,16 +69,12 @@ def set_xlim(data: DataSource, x, *arg, xlim=None, **kwargs) -> PlotAction:
     ----------
     x
     """
-    lim = _get_lim_parameter(get_subset()(data, x), xlim)
 
     @gen_plotter
     def plot(ax):
-        if lim is not None:
-            now_lim = ax.get_xlim()
-            next_lim = [None, None]
-            next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
-            next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
-            ax.set_xlim(next_lim)
+        now_lim = ax.get_xlim()
+        next_lim = _get_lim_parameter(now_lim, xlim)
+        ax.set_xlim(next_lim)
         return None
     return plot
 
@@ -83,16 +87,12 @@ def set_ylim(data: DataSource, y, *arg, ylim=None, **kwargs) -> PlotAction:
     ----------
     y
     """
-    lim = _get_lim_parameter(get_subset()(data, y), ylim)
 
     @gen_plotter
     def plot(ax):
-        if lim is not None:
-            now_lim = ax.get_ylim()
-            next_lim = [None, None]
-            next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
-            next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
-            ax.set_ylim(next_lim)
+        now_lim = ax.get_ylim()
+        next_lim = _get_lim_parameter(now_lim, ylim)
+        ax.set_ylim(next_lim)
         return None
     return plot
 
@@ -105,19 +105,15 @@ def set_zlim(data: DataSource, z, *arg, zlim=None, **kwargs) -> PlotAction:
     ----------
     z
     """
-    lim = _get_lim_parameter(get_subset()(data, z), zlim)
 
     @gen_plotter
     def plot(ax):
         if not hasattr(ax, "get_zlim"):
             return None
 
-        if lim is not None:
-            now_lim = ax.get_zlim()
-            next_lim = [None, None]
-            next_lim[0] = lim[0] if lim[0] not in _invalid_range else now_lim[0]
-            next_lim[1] = lim[1] if lim[1] not in _invalid_range else now_lim[1]
-            ax.set_zlim(next_lim)
+        now_lim = ax.get_zlim()
+        next_lim = _get_lim_parameter(now_lim, zlim)
+        ax.set_zlim(next_lim)
         return None
     return plot
 
