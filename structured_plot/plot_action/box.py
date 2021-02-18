@@ -52,14 +52,29 @@ def box(
     if summarizer is not None:
         summarizer(zip(_xs, _data_without_nan))
 
-    _labels = list(map(map_of_xlabel, labels if labels else _xs))
+    _labels = labels if labels else _xs
+
+    if callable(map_of_xlabel):
+        _labels = list(map(map_of_xlabel, _labels))
+    elif isinstance(map_of_xlabel, dict):
+        _labels = [map_of_xlabel.get(k, k) for k in _labels]
+    else:
+        _labels = _labels
+
+    _positions = range(0, len(_xs))
+    if callable(map_of_position):
+        positions = list(map(map_of_position, _positions))
+    elif isinstance(map_of_position, dict):
+        positions = [map_of_position.get(k, k) for k in _positions]
+    else:
+        positions = _positions
 
     @gen_plotter
     def plot(ax):
         artist = ax.boxplot(
             _data_without_nan,
             labels=_labels,
-            positions=list(map(map_of_position, range(0, len(_xs)))),
+            positions=positions,
             **kwargs
         )
         return artist
