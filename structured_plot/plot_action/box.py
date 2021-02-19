@@ -1,6 +1,6 @@
+from __future__ import annotations
 from ..kit import gen_action, gen_plotter, get_subset, Iget_factor
 from ..type_set import DataSource, PlotAction
-from typing import Union, List
 import pandas as pd
 
 box_option = {
@@ -31,14 +31,19 @@ box_option = {
 
 
 @gen_action(["data", "x"],
-            {**box_option, "labels": None, "presenter": None, "summarizer": None, "map_of_position": lambda p: p, "map_of_xlabel": lambda label: label})
+            box_option | {
+                "labels": None, "presenter": None, "summarizer": None,
+                "map_of_position": lambda p: p, "map_of_xlabel": lambda label: label,
+                "positions": None
+})
 def box(
         data: DataSource,
-        x: Union[str, List[str]],
+        x: str | list[str],
         *arg,
         labels=None,
         presenter=None,
         summarizer=None,
+        positions=None,
         map_of_position=lambda x: x,
         map_of_xlabel=lambda x: x,
         **kwargs) -> PlotAction:
@@ -52,7 +57,7 @@ def box(
     if summarizer is not None:
         summarizer(zip(_xs, _data_without_nan))
 
-    _labels = labels if labels else _xs
+    _labels = labels or _xs
 
     if callable(map_of_xlabel):
         _labels = list(map(map_of_xlabel, _labels))
@@ -61,20 +66,20 @@ def box(
     else:
         _labels = _labels
 
-    _positions = range(0, len(_xs))
+    _positions = positions or range(0, len(_xs))
     if callable(map_of_position):
-        positions = list(map(map_of_position, _positions))
+        _positions = list(map(map_of_position, _positions))
     elif isinstance(map_of_position, dict):
-        positions = [map_of_position.get(k, k) for k in _positions]
+        _positions = [map_of_position.get(k, k) for k in _positions]
     else:
-        positions = _positions
+        _positions = _positions
 
     @gen_plotter
     def plot(ax):
         artist = ax.boxplot(
             _data_without_nan,
             labels=_labels,
-            positions=positions,
+            positions=_positions,
             **kwargs
         )
         return artist
