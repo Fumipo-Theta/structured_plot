@@ -43,9 +43,10 @@ from .errorbar import errorbar
 from .fill import fill, fill_between
 from .hist import hist
 from .imshow import imshow
-from .line import line, plot
+from .line import line
 # from .mapping import *
 from .multiple import multiple, m
+from .plot import plot
 from .scatter import scatter
 from .text import text
 from .velocity import velocity

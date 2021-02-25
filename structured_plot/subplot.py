@@ -516,7 +516,7 @@ class Subplot(ISubplot):
         self.filter_x = within_xlim
         self.is_second_axes.append(second_axis)
 
-        self.length = self.length+1
+        self.length = self.length + 1
         return self
 
     def forked(self,

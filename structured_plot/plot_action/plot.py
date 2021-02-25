@@ -1,11 +1,6 @@
-
 from ..kit import gen_action, gen_plotter, get_subset, get_literal_or_series
 from ..type_set import DataSource, PlotAction
 from .artist_options import line2d_option
-
-
-def iterable(i):
-    return hasattr(i, "__iter__")
 
 
 @gen_action(["data", "x", "y", "z"], {
@@ -15,7 +10,7 @@ def iterable(i):
     **line2d_option
 }
 )
-def line(
+def plot(
         data: DataSource,
         *arg,
         fmt=None,
@@ -25,12 +20,10 @@ def line(
 
     gen_action.line(x, y, [z], fmt=None, **kwargs)
     """
-    if len(data) == 0:
-        return gen_plotter(lambda ax: None)
-
     plot_data = [get_subset()(data, selector)
                  for selector in filter(lambda e: e is not None, arg)]
 
+    plot_data = [*arg]
     if fmt is not None:
         plot_data += [fmt]
 
