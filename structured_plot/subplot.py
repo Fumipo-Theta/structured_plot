@@ -301,7 +301,7 @@ class Subplot(ISubplot):
 
         if len(df) == 0:
             return Subplot.__action_plot_nothing
-        if all(map(lambda df: len(df) == 0, df.args)):
+        if all(map(lambda df: df is not None and len(df) == 0, self.data)):
             return Subplot.__action_plot_nothing
 
         def switch_by_func_type(f, data, option):
