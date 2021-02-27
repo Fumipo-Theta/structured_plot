@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def __safe_filename(filename: str) -> str:
-    return filename.replace("/", "").replace("\\", "")
+    return filename.replace("/", "").replace(":", "").replace("\\", "")
 
 
 def __mkdir(f):
@@ -18,7 +18,7 @@ def __mkdir(f):
 def __actionSavePNG(directory, filename, must_close):
     # パスが有効かどうかを検証し, ディレクトリがなければ作成する
     def save(postfix=""):
-        path = directory+__safe_filename(filename+postfix+'.png')
+        path = directory + __safe_filename(filename + postfix + '.png')
         plt.savefig(path)
         if must_close:
             plt.close()
