@@ -28,6 +28,8 @@ def _lim_parser(orig_new: tuple[float, str | float | int | Callable[[float], flo
         return orig
     if callable(new):
         return new(orig)
+    if isinstance(new, pd.Timestamp):
+        return new
 
     try:
         return float(new)
