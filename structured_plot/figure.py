@@ -1,4 +1,5 @@
 # %%
+from __future__ import annotations
 from typing import Callable, Iterable, List, Dict, Tuple, Union
 
 from func_helper import pip, identity
@@ -179,7 +180,7 @@ class Figure:
                       sizes,
                       column=1,
                       margin=(1, 0.5),
-                      padding={},
+                      padding: dict[str, float] | list[float] = {},
                       order=None,
                       unit="inches",
                       dpi=72,
@@ -193,7 +194,7 @@ class Figure:
     def _show_on_layout(self,
                         layout,
                         order=None,
-                        padding={},
+                        padding: dict[str, float] | list[float] = {},
                         test=False,
                         verbose=False,
                         **kwargs):

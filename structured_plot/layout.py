@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 from func_helper import pip
@@ -55,12 +56,7 @@ class Layout:
             ))}
         """
 
-    def __init__(self, padding={
-        "top": 0.1,
-        "left": 0.5,
-        "bottom": 0.5,
-        "right": 0.2
-    }, unit: str = "inches", dpi: str = 72):
+    def __init__(self, padding: dict | list = {}, unit: str = "inches", dpi: str = 72):
         """
         Generate instance.
         With setup unit of length and dpi optionally.
@@ -85,8 +81,9 @@ class Layout:
             "facecolor": "white"
         }
         self.unit = unit
-        self.to_default_unit = Layout.IToDefaultUnit(unit, dpi)
-        self.default_padding = padding
+        unit_translator = Layout.IToDefaultUnit(unit, dpi)
+        self.to_default_unit = unit_translator
+        self.default_padding = Padding.parse(unit_translator(padding))
         self._subgrids = {}
 
     def __len__(self):
@@ -139,15 +136,15 @@ class Layout:
     @staticmethod
     def IToDefaultUnit(unit: str, dpi: int) -> Callable[[T], T]:
         if unit == "mm":
-            return vectorize(lambda x: x/25.4 if x else x)
+            return vectorize(lambda x: x / 25.4 if x else x)
         elif unit == "cm":
-            return vectorize(lambda x: x/2.54 if x else x)
+            return vectorize(lambda x: x / 2.54 if x else x)
         elif unit == "px":
-            return vectorize(lambda x: x/dpi if x else x)
+            return vectorize(lambda x: x / dpi if x else x)
         else:
             return vectorize(lambda x: x)
 
-    def get_padding(self, padding: Padding) -> Padding:
+    def get_padding(self, padding: dict | list) -> Padding:
         """
         Reset padding.
 
@@ -164,7 +161,8 @@ class Layout:
                 "right" : 0.2
             }
         """
-        return {**self.default_padding, **self.to_default_unit(padding)}
+        new_pad = Padding.parse(self.to_default_unit(padding))
+        return self.default_padding | new_pad
 
     def get_width(self) -> Number:
         """
@@ -223,7 +221,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  **kwd), new_name)
+        self.set_subgrid(Subgrid(next_size, next_origin, **kwd), new_name)
         return self
 
     def from_left_top(self, origin_name, new_name, size: Size, offset: Size = (0, 0), sharex=None, sharey=None, **kwd):
@@ -268,7 +266,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -289,7 +287,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -310,7 +308,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -358,7 +356,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -383,7 +381,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -407,7 +405,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -431,7 +429,7 @@ class Layout:
         )
 
         self.__expand(next_origin, next_size)
-        self.set_subgrid(Subgrid(next_size, next_origin,  sharex=self.get_a_subgrid(
+        self.set_subgrid(Subgrid(next_size, next_origin, sharex=self.get_a_subgrid(
             sharex), sharey=self.get_a_subgrid(sharey), **kwd), new_name)
         return self
 
@@ -490,40 +488,40 @@ class Layout:
 
             if len(self) % column == 0:
                 self.add_bottom(
-                    safe_get(names, l-column, l-column),
-                    safe_get(names, i+1, i+1),
+                    safe_get(names, l - column, l - column),
+                    safe_get(names, i + 1, i + 1),
                     size, d, **kwd
                 )
             else:
                 self.add_right(
-                    safe_get(names, l-1, l-1),
-                    safe_get(names, i+1, i+1),
+                    safe_get(names, l - 1, l - 1),
+                    safe_get(names, i + 1, i + 1),
                     size, d, **kwd
                 )
 
         return self
 
-    def __scale(self, v: Union[Coordinate, Size], padding: Padding = {}) -> Union[Coordinate, Size]:
+    def __scale(self, v: Union[Coordinate, Size], padding: dict | list) -> Union[Coordinate, Size]:
         """
         Scaling position in figure by figure size.
         Padding is took into considered.
         """
-        pad = self.get_padding(padding)
+        pad: Padding = self.get_padding(padding)
 
-        size = np.add(self.get_size(), (pad["left"]+pad["right"], pad["top"] + pad["bottom"])
+        size = np.add(self.get_size(), (pad.left + pad.right, pad.top + pad.bottom)
                       )
 
         if 0 in size:
             raise SystemError("Size cannot be zero")
 
         origin = np.add(
-            self.left_top, (-pad["left"], -pad["top"]))
+            self.left_top, (-pad.left, -pad.top))
         # r = (v - o)/s
         return tuple(
             np.divide(np.add(v, np.multiply(origin, -1)), size)
         )
 
-    def __relative(self, subgrid, padding: Padding = {}) -> Tuple[Coordinate, Coordinate]:
+    def __relative(self, subgrid, padding: dict | list) -> Tuple[Coordinate, Coordinate]:
         """
         Return scaled position of left-top and right-bottom
             corners of a subgrid.
@@ -533,7 +531,7 @@ class Layout:
         rel_right_bottom = self.__scale(subgrid.get_right_bottom(), padding)
         return (rel_left_top, rel_right_bottom)
 
-    def axes_position(self, subgrid, padding: Padding = {}) -> List[Number]:
+    def axes_position(self, subgrid, padding: dict | list = {}) -> List[Number]:
         """
         Return matplotlib style position of ax.
         """
@@ -543,7 +541,7 @@ class Layout:
         position = [lt[0], 1 - rb[1], rb[0] - lt[0], rb[1] - lt[1]]
         return position
 
-    def generate_axes(self, figure: Fig, padding: Padding = {}) -> Callable[[Subgrid], Ax]:
+    def generate_axes(self, figure: Fig, padding: dict | list = {}) -> Callable[[Subgrid], Ax]:
         """
         Generate matplotlib.pyplot.axsubplot.
 
@@ -567,7 +565,7 @@ class Layout:
 
     def figure_and_axes(self,
                         subgrid_names: List[str] = None,
-                        padding: Padding = {},
+                        padding: dict | list = {},
                         figsize: Optional[Size] = None,
                         dpi: Optional[int] = None,
                         **figure_kwargs) -> Tuple[Fig, List[Ax]]:
@@ -635,4 +633,4 @@ class Layout:
         padding = MatPos.fontsize_to_point(12, 5)
 
         """
-        return fontsize*n/dpi
+        return fontsize * n / dpi
