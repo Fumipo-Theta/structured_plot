@@ -135,7 +135,7 @@ def factor_bar(
         stack_bars = pip(
             it.mapping(lambda bars: pip(
                 it.mapping(lambda t: 0 if (t[1] == 0) or np.isnan(t[1])
-                           else t[0]/t[1]),
+                           else t[0] / t[1]),
                 it.mapping(lambda v: 0 if np.isnan(v) else v),
                 list
             )(zip(bars, sum))),
@@ -160,7 +160,7 @@ def factor_bar(
                 else:
                     art = ax.bar(
                         position, bar, bottom=prev_top, **plot_arg)
-                    prev_top = [a+b for a, b in zip(prev_top, bar)]
+                    prev_top = [a + b for a, b in zip(prev_top, bar)]
                 artists.append(art)
             else:
                 if i == 0:
@@ -168,7 +168,7 @@ def factor_bar(
                 else:
                     art = ax.barh(
                         position, bar, left=prev_top, **plot_arg)
-                    prev_top = [a+b for a, b in zip(prev_top, bar)]
+                    prev_top = [a + b for a, b in zip(prev_top, bar)]
 
                 artists.append(art)
 
@@ -270,7 +270,7 @@ def bar(
         stack_bars = pip(
             it.mapping(lambda bars: pip(
                 it.mapping(lambda t: 0 if (t[1] == 0) or np.isnan(t[1])
-                           else t[0]/t[1]),
+                           else t[0] / t[1]),
                 it.mapping(lambda v: 0 if np.isnan(v) else v),
                 list
             )(zip(bars, sum))),
@@ -295,7 +295,7 @@ def bar(
                 else:
                     art = ax.bar(
                         position, bar, bottom=prev_top, **plot_arg)
-                    prev_top = [a+b for a, b in zip(prev_top, bar)]
+                    prev_top = [a + b for a, b in zip(prev_top, bar)]
                 artists.append(art)
             else:
                 if i == 0:
@@ -303,7 +303,7 @@ def bar(
                 else:
                     art = ax.barh(
                         position, bar, left=prev_top, **plot_arg)
-                    prev_top = [a+b for a, b in zip(prev_top, bar)]
+                    prev_top = [a + b for a, b in zip(prev_top, bar)]
                 artists.append(art)
 
         if (legend is not None) and (legend is not False):
@@ -394,9 +394,9 @@ def group_bar(
         for gname in g_factor
     ]
 
-    each_width = width/len(g_factor)
+    each_width = width / len(g_factor)
 
-    def shift(i, l, w): return - w*(l-1)/2 + w*i
+    def shift(i, l, w): return - w * (l - 1) / 2 + w * i
 
     @gen_plotter
     def plot(ax):
@@ -478,7 +478,7 @@ def rose(
         sum = np.sum(heights)
 
         heights = heights.apply(
-            lambda height: 0 if sum == 0 else height/sum)
+            lambda height: 0 if sum == 0 else height / sum)
 
     plot_arg = {
         "width": width,
