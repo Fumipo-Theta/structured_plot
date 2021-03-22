@@ -107,7 +107,13 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
     if summarizer is not None:
         summarizer(zip(_factor, _data_without_nan))
 
-    labels = list(map(map_of_xlabel, _factor))
+    _labels = _factor
+    if callable(map_of_xlabel):
+        _labels = list(map(map_of_xlabel, _labels))
+    elif isinstance(map_of_xlabel, dict):
+        _labels = [map_of_xlabel.get(k, k) for k in _labels]
+    else:
+        _labels = _labels
 
     @gen_plotter
     def plot(ax):
@@ -116,16 +122,16 @@ def factor_box(data: DataSource, x, y, xfactor=None, presenter=None, summarizer=
             return None
         artist = ax.boxplot(
             _data_without_nan,
-            labels=labels,
+            labels=_labels,
             positions=list(map(map_of_position, position)),
             **kwargs
         )
 
         if kwargs.get("vert", True):
             ax.set_xticks(position)
-            ax.set_xticklabels(labels)
+            ax.set_xticklabels(_labels)
         else:
             ax.set_yticks(position)
-            ax.set_yticklabels(labels)
+            ax.set_yticklabels(_labels)
         return artist
     return plot
