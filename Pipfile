@@ -7,6 +7,7 @@ name = "pypi"
 pandas = "*"
 matplotlib = "*"
 numpy = "*"
+scipy = "*"
 dict-helper = {git = "https://github.com/Fumipo-Theta/dict_helper"}
 func-helper = {git = "https://github.com/Fumipo-Theta/func_helper"}
 iter-helper = {git = "https://github.com/Fumipo-Theta/iter_helper"}

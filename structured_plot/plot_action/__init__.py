@@ -37,7 +37,7 @@ from .axes_style import twinx
 from .band import hband, vband, xband, yband
 from .bar import bar, factor_bar, group_bar, rose
 from .box import box, factor_box
-from .contour import contour, contourf
+from .contour import contour, contourf, density_contour
 # from .cycler import *
 from .errorbar import errorbar
 from .fill import fill, fill_between
