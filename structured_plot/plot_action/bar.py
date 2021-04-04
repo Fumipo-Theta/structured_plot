@@ -253,6 +253,7 @@ def bar(
         # それを回避するためにfillna(0)してある.
         stack_heights = pip(
             it.mapping(lambda df: yagg(df[stack_name].fillna(0))),
+            it.mapping(lambda v: 0 if np.isnan(v) else v),
             # it.mapping(lambda arr: arr[0] if len(arr) > 0 else 0),
             list
         )(subset_for_x_factor)
@@ -288,7 +289,7 @@ def bar(
         artists = []
 
         for i, bar in enumerate(stack_bars):
-            # print(prev_top)
+            print(prev_top)
             if vert:
                 if i == 0:
                     art = ax.bar(position, bar, **plot_arg)
