@@ -209,7 +209,7 @@ def bar(
     data: DataSource,
     x,  # factor1 selector
     y: str,  # stack factor selector
-    yagg,  # aggregate
+    yagg,  # aggregate: (DataFrame, Hashable) -> Number
     *arg,
     color=None,
     xfactor=None,  # explicit factor list
@@ -226,7 +226,9 @@ def bar(
     xfactor:
         List of factor values or function generate it from dataframe.
     yagg:
-        Function for aggligating y factor.
+        Function for aggregating y factor.
+        The spec is (pd.DataFrame, Hashable) -> Number
+        Hashable is one of a column name in the DataFrame, which comes from stacking parameters.
     """
 
     stack_factor = y if type(y) is list else [y]
@@ -252,7 +254,7 @@ def bar(
         # aggrigation時にnanがあると, normalize時にsumがnanになる.
         # それを回避するためにfillna(0)してある.
         stack_heights = pip(
-            it.mapping(lambda df: yagg(df[stack_name].fillna(0))),
+            it.mapping(lambda df: yagg(df, stack_name)),
             it.mapping(lambda v: 0 if np.isnan(v) else v),
             # it.mapping(lambda arr: arr[0] if len(arr) > 0 else 0),
             list
