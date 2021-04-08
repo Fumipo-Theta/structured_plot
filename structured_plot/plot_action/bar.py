@@ -289,7 +289,7 @@ def bar(
         artists = []
 
         for i, bar in enumerate(stack_bars):
-            print(prev_top)
+            # print(prev_top)
             if vert:
                 if i == 0:
                     art = ax.bar(position, bar, **plot_arg)
