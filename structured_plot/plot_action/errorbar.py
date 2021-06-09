@@ -32,8 +32,8 @@ def errorbar(
 
     _x = get_subset()(data, x)
     _y = get_subset()(data, y)
-    _xerr = get_subset()(data, xerr)
-    _yerr = get_subset()(data, yerr)
+    _xerr = None if xerr is None else get_subset()(data, xerr)
+    _yerr = None if yerr is None else get_subset()(data, yerr)
 
     @gen_plotter
     def plot(ax):

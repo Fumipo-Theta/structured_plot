@@ -271,7 +271,7 @@ def set_label(
 
     @gen_plotter
     def plot(ax):
-        if xlabel is not None:
+        if xlabel and xlabel != False:
             ax.set_xlabel(
                 xlabel,
                 **kwargs
@@ -281,7 +281,7 @@ def set_label(
             ax.xaxis.set_label_position(xlabelposition)
             plt.setp(ax.get_xticklabels(), visible=True)
 
-        if ylabel is not None:
+        if ylabel and ylabel != False:
             ax.set_ylabel(
                 ylabel,
                 **kwargs
@@ -290,7 +290,7 @@ def set_label(
             ax.yaxis.set_label_position(ylabelposition)
             plt.setp(ax.get_yticklabels(), visible=True)
 
-        if zlabel is not None:
+        if zlabel and zlabel != False:
             ax.set_zlabel(
                 zlabel,
                 **kwargs
@@ -308,7 +308,7 @@ def set_xlabel(xlabel: str, *arg, xlabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
-        if xlabel is not None:
+        if xlabel and xlabel != False:
             ax.set_xlabel(
                 xlabel,
                 **kwargs
@@ -326,7 +326,7 @@ def set_ylabel(ylabel: str, *arg, ylabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
-        if ylabel is not None:
+        if ylabel and ylabel != False:
             ax.set_ylabel(
                 ylabel,
                 **kwargs
@@ -343,7 +343,7 @@ def set_zlabel(zlabel: str, *arg, zlabelposition=None, **kwargs) -> PlotAction:
 
     @gen_plotter
     def plot(ax):
-        if zlabel is not None:
+        if zlabel and zlabel != False:
             ax.set_zlabel(
                 zlabel,
                 **kwargs
