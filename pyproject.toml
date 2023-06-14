@@ -1,3 +1,30 @@
+[tool.poetry]
+name = "structured-plot"
+version = "0.1.0"
+description = ""
+authors = ["Fumipo-Theta"]
+readme = "readme.md"
+packages = [{include = "structured_plot"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<3.12"
+numpy = "^1.24.3"
+matplotlib = "<3.7.0"
+structured-plot = {git = "https://github.com/Fumipo-Theta/structured_plot"}
+func-helper = {git = "https://github.com/Fumipo-Theta/func_helper"}
+iter-helper = {git = "https://github.com/Fumipo-Theta/iter_helper"}
+dataframe-helper = {git = "https://github.com/Fumipo-Theta/dataframe_helper"}
+dict-helper = {git = "https://github.com/Fumipo-Theta/dict_helper"}
+data-loader = {git = "https://github.com/Fumipo-Theta/data_loader"}
+chardet = "^5.1.0"
+tqdm = "^4.65.0"
+japanize-matplotlib = "^1.1.3"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.3.0"
+black = "^23.3.0"
+flake8 = "^6.0.0"
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

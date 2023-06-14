@@ -7,6 +7,7 @@ from typing import Callable, Optional
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 
 
 def set_cycler(cycler=None):
@@ -245,7 +246,7 @@ def axis_scale(*arg, xscale=None, yscale=None, zscale=None):
 label_option = {
     "alpha": 1,
     "color": "black",
-    "family": ["Noto Sans CJK JP", "sans-serif"],
+    # "family": ["Noto Sans CJK JP", "sans-serif"],
     # "fontname" : "sans-serif",
     "fontsize": 16,
     "fontstyle": "normal",
